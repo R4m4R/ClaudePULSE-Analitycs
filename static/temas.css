@@ -1,0 +1,33 @@
+/* Catálogo de temas. Claro y Oscuro viven en tema.css; aquí el resto. */
+:root[data-theme=corporate]{--bg:#f2f4f8;--card:#fff;--card2:#e9edf5;--bd:#dce2ee;--tx:#12233f;--mu:#586986;--ac:#0b5cab;--acrgb:11,92,171;--ok:#1b9e77;--warn:#e9a23b;--bad:#c8553d;--sh:0 1px 2px rgba(18,35,63,.06),0 10px 26px rgba(18,35,63,.08);--side:linear-gradient(185deg,#0b2545 0%,#13315c 100%);--glass:rgba(242,244,248,.88)}
+:root[data-theme=forest]{--bg:#f0f6f1;--card:#fff;--card2:#e5efe7;--bd:#d3e4d8;--tx:#12261b;--mu:#566f5f;--ac:#1f8a4c;--acrgb:31,138,76;--ok:#1f8a4c;--warn:#e9a23b;--bad:#c8553d;--sh:0 1px 2px rgba(18,38,27,.05),0 10px 26px rgba(18,38,27,.08);--side:linear-gradient(185deg,#0f2a1c 0%,#1b4332 100%);--glass:rgba(240,246,241,.88)}
+:root[data-theme=lavender]{--bg:#f6f3fb;--card:#fff;--card2:#ede8f8;--bd:#e0d8f1;--tx:#231a3d;--mu:#6a5e8f;--ac:#7c4dff;--acrgb:124,77,255;--ok:#12b886;--warn:#f59f00;--bad:#e03166;--sh:0 1px 2px rgba(35,26,61,.05),0 10px 26px rgba(70,40,150,.09);--side:linear-gradient(185deg,#241446 0%,#3b2370 100%);--glass:rgba(246,243,251,.88)}
+:root[data-theme=midnight]{color-scheme:dark;--bg:#050816;--card:#0d1330;--card2:#141c42;--bd:#1f2a5c;--tx:#e6eaff;--mu:#8794d1;--ac:#5b8cff;--acrgb:91,140,255;--ok:#34d399;--warn:#fbbf24;--bad:#f87171;--sh:0 1px 2px rgba(0,0,0,.4),0 12px 34px rgba(0,0,0,.45);--side:linear-gradient(185deg,#03050f 0%,#0a1030 100%);--glass:rgba(5,8,22,.86)}
+:root[data-theme=ocean]{color-scheme:dark;--bg:#04141a;--card:#0a232c;--card2:#0f3340;--bd:#164552;--tx:#dff6fa;--mu:#7fb2bf;--ac:#22d3ee;--acrgb:34,211,238;--ok:#2dd4bf;--warn:#fbbf24;--bad:#fb7185;--sh:0 1px 2px rgba(0,0,0,.4),0 12px 34px rgba(0,0,0,.45);--side:linear-gradient(185deg,#021015 0%,#08323d 100%);--glass:rgba(4,20,26,.86)}
+:root[data-theme=sunset]{color-scheme:dark;--bg:#160d1f;--card:#231331;--card2:#2e1a40;--bd:#422559;--tx:#fbeee6;--mu:#c3a1b5;--ac:#ff8a4c;--acrgb:255,138,76;--ok:#2dd4bf;--warn:#fbbf24;--bad:#fb7185;--sh:0 1px 2px rgba(0,0,0,.4),0 12px 34px rgba(0,0,0,.45);--side:linear-gradient(185deg,#12081b 0%,#3a1648 100%);--glass:rgba(22,13,31,.86)}
+:root[data-theme=graphite]{color-scheme:dark;--bg:#121212;--card:#1c1c1e;--card2:#262629;--bd:#35353a;--tx:#ececec;--mu:#9b9ba3;--ac:#fbbf24;--acrgb:251,191,36;--ok:#34d399;--warn:#fb923c;--bad:#f87171;--sh:0 1px 2px rgba(0,0,0,.5),0 12px 30px rgba(0,0,0,.5);--side:linear-gradient(185deg,#0a0a0b 0%,#1a1a1d 100%);--glass:rgba(18,18,18,.88)}
+:root[data-theme=contrast]{color-scheme:dark;--bg:#000;--card:#0a0a0a;--card2:#171717;--bd:#7a7a7a;--tx:#fff;--mu:#d6d6d6;--ac:#ffe600;--acrgb:255,230,0;--ok:#00ff9c;--warn:#ffb000;--bad:#ff4d4d;--sh:none;--side:#000;--glass:rgba(0,0,0,.92)}
+:root[data-theme=contrast] .side{border-right:2px solid #7a7a7a}:root[data-theme=contrast] .pri,:root[data-theme=contrast] .sub button.on{color:#000}
+/* Selector de temas (configuración) */
+.mbox{max-height:92vh;overflow:auto}
+.lbl{font-size:.72rem;font-weight:600;color:var(--mu);text-transform:uppercase;letter-spacing:.06em;display:block;margin-bottom:6px}
+.thg{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.thc{display:grid;gap:6px;justify-items:center;padding:8px 4px;font-size:.72rem;border-radius:12px;color:var(--tx)}
+.thc.on{border-color:var(--ac);box-shadow:0 0 0 2px rgba(var(--acrgb),.35);color:var(--ac);font-weight:600}
+.thc .sw{position:relative;width:100%;height:38px;border-radius:8px;border:1px solid var(--bd);overflow:hidden}
+.thc .sw i{position:absolute;left:12%;top:22%;width:50%;height:56%;border-radius:5px;opacity:.95}
+.thc .sw u{position:absolute;right:12%;bottom:22%;width:16px;height:16px;border-radius:50%}
+.toast{position:fixed;left:50%;bottom:26px;transform:translate(-50%,16px);opacity:0;pointer-events:none;background:var(--card);color:var(--tx);border:1px solid var(--ac);border-radius:30px;padding:9px 18px;font-size:.85rem;box-shadow:var(--sh);transition:.25s;z-index:90}
+.toast.on{opacity:1;transform:translate(-50%,0)}
+@media(max-width:420px){.thg{grid-template-columns:repeat(2,1fr)}}
+
+/* Acento secundario (--ac2) y acento del menú lateral (--sac) por tema */
+:root[data-theme=dark]{--ac2:#b08cff;--sac:#8ea2ff;--sacrgb:142,162,255}
+:root[data-theme=midnight]{--ac2:#a78bfa;--sac:#7aa2ff;--sacrgb:122,162,255}
+:root[data-theme=ocean]{--ac2:#2dd4bf;--sac:#5be3f5;--sacrgb:91,227,245}
+:root[data-theme=sunset]{--ac2:#f472b6;--sac:#ffa56f;--sacrgb:255,165,111}
+:root[data-theme=graphite]{--ac2:#f59e0b;--sac:#fcd34d;--sacrgb:252,211,77}
+:root[data-theme=corporate]{--ac2:#2a9d8f;--sac:#6cb0ff;--sacrgb:108,176,255}
+:root[data-theme=forest]{--ac2:#6aa84f;--sac:#6fd39a;--sacrgb:111,211,154}
+:root[data-theme=lavender]{--ac2:#ec4899;--sac:#b79cff;--sacrgb:183,156,255}
+:root[data-theme=contrast]{--ac2:#00e5ff;--sac:#ffe600;--sacrgb:255,230,0}

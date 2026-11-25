@@ -1,0 +1,6 @@
+/* Tokens de tema: claro / oscuro / automático (según el sistema) */
+:root{--bg:#f3f5fb;--card:#fff;--card2:#eef1f9;--bd:#e1e6f3;--tx:#0e1a3d;--mu:#5f6c96;--ac:#3b5bdb;--acrgb:59,91,219;--ok:#12b886;--warn:#f59f00;--bad:#e03131;
+--sh:0 1px 2px rgba(15,25,70,.05),0 10px 28px rgba(15,25,70,.07);--side:linear-gradient(185deg,#0a1233 0%,#16245a 100%);--glass:rgba(243,245,251,.85);--r:14px;--font:'Inter','Segoe UI',system-ui,-apple-system,sans-serif}
+:root[data-theme=dark]{--bg:#0a0f24;--card:#111a38;--card2:#18234b;--bd:#233063;--tx:#e8ecfb;--mu:#8d9ac8;--ac:#7c93ff;--acrgb:124,147,255;--sh:0 1px 2px rgba(0,0,0,.3),0 10px 30px rgba(0,0,0,.35);--side:linear-gradient(185deg,#070b1c 0%,#0f1838 100%);--glass:rgba(10,15,36,.85)}
+@media(prefers-color-scheme:dark){:root:not([data-theme=light]){--bg:#0a0f24;--card:#111a38;--card2:#18234b;--bd:#233063;--tx:#e8ecfb;--mu:#8d9ac8;--ac:#7c93ff;--acrgb:124,147,255;--sh:0 1px 2px rgba(0,0,0,.3),0 10px 30px rgba(0,0,0,.35);--side:linear-gradient(185deg,#070b1c 0%,#0f1838 100%);--glass:rgba(10,15,36,.85)}}
+@media print{.side,.filters,.hdr-r,.modal{display:none!important}.main{margin:0!important}.pane{display:block!important;page-break-inside:avoid}body{background:#fff}.box,.kpi{box-shadow:none;break-inside:avoid}}

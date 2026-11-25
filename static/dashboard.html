@@ -1,0 +1,296 @@
+<!DOCTYPE html>
+<html lang="es"><head><meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Claude Code Analytics</title>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.js"></script>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/static/tema.css"><link rel="stylesheet" href="/static/temas.css"><link rel="stylesheet" href="/static/estilos.css"><link rel="stylesheet" href="/static/componentes.css"></head><body>
+<div id="ld" class="loader on"><div class="ldbox"><div class="spin"></div><b id="ldh">Cargando datos…</b><p id="ldm">Leyendo registros de Claude Code…</p><div class="ldbar"><i></i></div><small id="ldt">0 s</small><button class="pri retry" onclick="load()">Reintentar</button></div></div>
+<div class="app">
+<aside class="side"><div class="brand"><span class="logo">◆</span><div><b>Claude Code</b><small>Analytics</small></div></div>
+<nav class="tabs" id="tabs"></nav>
+<div class="side-foot"><div class="budget" id="bud"></div><button class="ghost" onclick="openCfg()">⚙ Configuración</button></div></aside>
+<main class="main">
+<header class="hdr"><div><h1 id="ttl">Visión general</h1><p class="status" id="st">Cargando…</p></div>
+<div class="hdr-r"><button class="ic" onclick="load()" title="Actualizar datos"><svg viewBox="0 0 24 24"><path d="M21 12a9 9 0 1 1-3-6.7L21 8"/><path d="M21 3v5h-5"/></svg></button><button class="ic" onclick="toggleTheme()" title="Cambiar tema"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 3v18a9 9 0 0 0 0-18z" fill="currentColor"/></svg></button><button class="ic" onclick="print()" title="Imprimir / PDF"><svg viewBox="0 0 24 24"><path d="M6 9V3h12v6M6 18H4a1 1 0 0 1-1-1v-6a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2v6a1 1 0 0 1-1 1h-2"/><rect x="6" y="14" width="12" height="7" rx="1"/></svg></button></div></header>
+<section class="filters">
+<div><label>Mes</label><select id="fm"></select></div><div><label>Día</label><select id="fd"></select></div>
+<div><label>Hora desde</label><select id="fh0"></select></div><div><label>Hora hasta</label><select id="fh1"></select></div>
+<div><label>Modelo</label><select id="fmo"></select></div><div><label>Proyecto</label><select id="fp"></select></div>
+<div style="align-self:end"><button onclick="reset()" style="width:100%">Limpiar filtros</button></div></section>
+<div class="pane on" id="p-general">
+ <div class="kpis" id="kg"></div>
+ <div class="ins-grid" id="ins"></div>
+ <div class="box w2"><div class="sub" id="gr"></div><h3>Gasto en el tiempo (USD)</h3><div class="cv t"><canvas id="c_ts"></canvas></div></div>
+ <div class="grid">
+  <div class="box"><h3>Gasto por modelo</h3><div class="cv"><canvas id="c_dm"></canvas></div></div>
+  <div class="box"><h3>Gasto por proyecto</h3><div class="cv"><canvas id="c_dp"></canvas></div></div>
+  <div class="box"><h3>Tokens por tipo en el tiempo</h3><div class="cv"><canvas id="c_tk"></canvas></div></div>
+  <div class="box w2"><h3>Horas de uso por día</h3><div class="cv"><canvas id="c_hd"></canvas></div></div>
+  <div class="box w2"><h3>Matriz Modelo × Proyecto (USD)</h3><div class="scroll" id="mx"></div></div>
+ </div>
+</div>
+
+<div class="pane" id="p-modelos"><div class="grid" id="cm"></div></div>
+<div class="pane" id="p-proyectos">
+ <div class="box w2" style="margin-bottom:12px"><h3>Todos los proyectos (clic = filtrar)</h3><div class="scroll" id="tp"></div></div>
+ <div class="grid" id="cp"></div>
+</div>
+<div class="pane" id="p-tiempo">
+ <div class="grid">
+  <div class="box"><h3>Gasto por hora del día (USD)</h3><div class="cv"><canvas id="t_h"></canvas></div></div>
+  <div class="box"><h3>Gasto por día de la semana (USD)</h3><div class="cv"><canvas id="t_w"></canvas></div></div>
+  <div class="box"><h3>Horas de uso por mes</h3><div class="cv"><canvas id="t_m"></canvas></div></div>
+  <div class="box"><h3>Minutos activos por hora del día</h3><div class="cv"><canvas id="t_a"></canvas></div></div>
+  <div class="box w2"><h3>Calendario de actividad · gasto por día</h3><div class="scroll" id="cal"></div></div>
+  <div class="box w2"><h3>Matriz Día de semana × Hora (USD)</h3><div class="scroll" id="hw"></div></div>
+  <div class="box w2"><h3>Matriz Día × Hora (USD)</h3><div class="scroll" id="hd"></div></div>
+  <div class="box w2"><h3>Detalle por día</h3><div class="scroll" id="td"></div></div>
+ </div>
+</div>
+
+<div class="pane" id="p-consumo">
+ <div class="kpis" id="kc"></div>
+ <div class="grid"><div class="box"><h3>Presupuesto del mes</h3><div class="cv"><canvas id="c_g"></canvas></div></div>
+ <div class="box"><h3>Consumo por proyecto (mes actual)</h3><div class="cv"><canvas id="c_cp"></canvas></div></div>
+ <div class="box w2"><h3>Acumulado vs ritmo de presupuesto y proyección</h3><div class="cv t"><canvas id="c_ac"></canvas></div></div></div>
+</div>
+<div class="pane" id="p-matrices"><div class="grid">
+ <div class="box w2"><h3>Tiempo × Modelo · Gasto</h3><div class="scroll" id="m1"></div></div>
+ <div class="box w2"><h3>Proyecto × Modelo · Horas de uso</h3><div class="scroll" id="m2"></div></div>
+ <div class="box w2"><h3>Tiempo × Proyecto · Tokens</h3><div class="scroll" id="m3"></div></div>
+ <div class="box w2"><h3>Tiempo × Modelo · Tokens</h3><div class="scroll" id="m4"></div></div></div></div>
+<div class="pane" id="p-eficiencia"><div class="kpis" id="ke"></div><div class="grid">
+ <div class="box"><h3>Coste por tipo de token</h3><div class="cv"><canvas id="e_tipo"></canvas></div></div>
+ <div class="box"><h3>Eficiencia de caché (% de lecturas)</h3><div class="cv"><canvas id="e_cache"></canvas></div></div>
+ <div class="box"><h3>Coste medio por mensaje</h3><div class="cv"><canvas id="e_cpm"></canvas></div></div>
+ <div class="box"><h3>Coste por mensaje y modelo</h3><div class="cv"><canvas id="e_mod"></canvas></div></div>
+ <div class="box w2"><h3>Pareto de proyectos · gasto acumulado</h3><div class="cv t"><canvas id="e_par"></canvas></div></div>
+ <div class="box w2"><h3>Top 10 días con más gasto</h3><div class="cv"><canvas id="e_top"></canvas></div></div></div></div>
+</main></div>
+<div class="modal" id="cfg"><div class="mbox"><h2>Configuración</h2>
+<label>Presupuesto mensual<input id="c_lim" type="number" min="0" step="1"></label>
+<label>Moneda<select id="c_cur"><option value="EUR">Euro (€)</option><option value="USD">Dólar ($)</option></select></label>
+<label>Tipo de cambio USD → EUR<input id="c_fx" type="number" min="0" step="0.01"></label>
+<div><span class="lbl">Tema</span><div class="thg" id="thg"></div></div>
+<label>Auto-refresco de datos<select id="c_rf"><option value="0">Desactivado</option><option value="1">Cada 1 minuto</option><option value="5">Cada 5 minutos</option><option value="15">Cada 15 minutos</option><option value="30">Cada 30 minutos</option><option value="60">Cada 1 hora</option></select></label>
+<div class="mact"><button class="ghost" onclick="cancelCfg()">Cancelar</button><button class="pri" onclick="saveCfg()">Guardar</button></div></div></div>
+<script>
+const $=id=>document.getElementById(id), COL=['#4f6bed','#14b8a6','#f59e0b','#ef4468','#38bdf8','#a78bfa','#84cc16','#fb923c','#22d3ee','#e879f9','#eab308','#94a3b8'];
+Chart.defaults.font.family="Inter,'Segoe UI',sans-serif";Chart.defaults.maintainAspectRatio=false;
+let RAW0=[],RAW=[],GR='auto',charts={},colors={},timer,TAB='general';
+const F={m:'',d:'',h0:0,h1:23,mo:'',p:''};
+const CFG=Object.assign({lim:180,cur:'EUR',fx:0.92,theme:'auto',rf:5},JSON.parse(localStorage.getItem('cfg')||'{}'));
+const SYM=()=>CFG.cur==='EUR'?'€':'$';
+const usd=v=>v.toLocaleString('es-ES',{minimumFractionDigits:2,maximumFractionDigits:2})+' '+SYM();
+const num=v=>v>=1e9?(v/1e9).toFixed(2)+' G':v>=1e6?(v/1e6).toFixed(2)+' M':v>=1e3?(v/1e3).toFixed(1)+' K':Math.round(v);
+const hrs=s=>{const m=Math.round(s/60);return m>=60?Math.floor(m/60)+' h '+(m%60)+' min':m+' min'};
+const mn=m=>m.replace('claude-','');
+const DOW=['Lun','Mar','Mié','Jue','Vie','Sáb','Dom'];
+const wd=d=>(new Date(d+'T12:00:00').getDay()+6)%7;
+function buildColors(){Object.keys(colors).forEach(k=>delete colors[k]);[...new Set(RAW.map(r=>r.m))].sort().forEach((m,i)=>{colors[m]=colors[mn(m)]=COL[i%COL.length]});[...new Set(RAW.map(r=>r.p))].sort().forEach((p,i)=>{if(!colors[p])colors[p]=COL[i%COL.length]})}
+function col(k){if(!colors[k]){let x=0;for(const ch of String(k))x=(x*31+ch.charCodeAt(0))>>>0;colors[k]=COL[x%COL.length]}return colors[k]}
+
+function agg(rows,fn){const m=new Map();for(const r of rows){const k=fn(r);let a=m.get(k);if(!a){a={c:0,t:0,i:0,o:0,cw:0,cr:0,n:0,s:0,g:0,days:new Set,mo:{},pr:{}};m.set(k,a)}
+ a.c+=r.c;a.i+=r.i;a.o+=r.o;a.cw+=r.cw;a.cr+=r.cr;a.t+=r.i+r.o+r.cw+r.cr;a.n+=r.n;a.s+=r.s;a.g+=r.g;a.days.add(r.d);a.mo[r.m]=(a.mo[r.m]||0)+r.c;a.pr[r.p]=(a.pr[r.p]||0)+r.c}return m}
+const topKey=o=>Object.entries(o).sort((a,b)=>b[1]-a[1])[0]?.[0]||'-';
+const sorted=m=>[...m.entries()].sort((a,b)=>b[1].c-a[1].c);
+
+function mk(id,cfg){if(charts[id])charts[id].destroy();charts[id]=new Chart($(id),cfg)}
+const grKey=(r,g)=>g==='m'?r.d.slice(0,7):g==='d'?r.d:String(r.h).padStart(2,'0')+':00';
+function gran(){return GR!=='auto'?GR:F.d?'h':F.m?'d':'m'}
+function series(rows,g,split,val='c'){const L=[...new Set(rows.map(r=>grKey(r,g)))].sort(),S=[...new Set(rows.map(split))],M={};
+ rows.forEach(r=>{const k=split(r)+'§'+grKey(r,g);M[k]=(M[k]||0)+r[val]});
+ return{labels:L,datasets:S.map(s=>({label:s,data:L.map(l=>+(M[s+'§'+l]||0).toFixed(4)),backgroundColor:col(s),borderRadius:3,stack:'a'}))}}
+const stackOpt=(y)=>({responsive:true,scales:{x:{stacked:true},y:{stacked:true,ticks:{callback:y||(v=>v)}}},plugins:{legend:{position:'bottom',labels:{boxWidth:10}}}});
+const usdOpt=()=>{const o=stackOpt(v=>v+' '+SYM());o.plugins.tooltip={callbacks:{label:c=>c.dataset.label+': '+usd(c.parsed.y)}};return o};
+function donut(id,m){const e=sorted(m);mk(id,{type:'doughnut',data:{labels:e.map(x=>mn(x[0])),datasets:[{data:e.map(x=>+x[1].c.toFixed(4)),backgroundColor:e.map(x=>col(x[0])),borderWidth:0}]},options:{cutout:'62%',plugins:{legend:{position:'right',labels:{boxWidth:10}},tooltip:{callbacks:{label:c=>mn(c.label)+': '+usd(c.parsed)}}}}})}
+
+function heat(el,rowsL,colsL,get,fmtc){let max=0;const vals=rowsL.map(r=>colsL.map(c=>{const v=get(r,c);if(v>max)max=v;return v}));
+ let h=`<div class="hm" style="grid-template-columns:auto repeat(${colsL.length},1fr)"><div class="l"></div>${colsL.map(c=>`<div class="l" style="justify-content:center">${c}</div>`).join('')}`;
+ rowsL.forEach((r,i)=>{h+=`<div class="l">${r}</div>`+vals[i].map(v=>`<div title="${fmtc(v)}" style="background:${v?`rgba(var(--acrgb),${.12+.88*v/max})`:''}"></div>`).join('')});$(el).innerHTML=h+'</div>'}
+
+function filtered(){return RAW.filter(r=>(!F.m||r.d.startsWith(F.m))&&(!F.d||r.d===F.d)&&r.h>=F.h0&&r.h<=F.h1&&(!F.mo||r.m===F.mo)&&(!F.p||r.p===F.p))}
+
+function fillSel(id,opts,val){$(id).innerHTML=opts.map(o=>`<option value="${o[0]}" ${o[0]==val?'selected':''}>${o[1]}</option>`).join('')}
+function buildFilters(){
+ const ms=[...new Set(RAW.map(r=>r.d.slice(0,7)))].sort().reverse();
+ fillSel('fm',[['','Todos los meses'],...ms.map(m=>[m,m])],F.m);
+ const ds=[...new Set(RAW.filter(r=>!F.m||r.d.startsWith(F.m)).map(r=>r.d))].sort().reverse();
+ if(F.d&&!ds.includes(F.d))F.d='';
+ fillSel('fd',[['','Todos los días'],...ds.map(d=>[d,d])],F.d);
+ const hs=[...Array(24).keys()].map(h=>[h,String(h).padStart(2,'0')+':00']);
+ fillSel('fh0',hs,F.h0);fillSel('fh1',hs,F.h1);
+ fillSel('fmo',[['','Todos los modelos'],...[...new Set(RAW.map(r=>r.m))].sort().map(m=>[m,mn(m)])],F.mo);
+ fillSel('fp',[['','Todos los proyectos'],...[...new Set(RAW.map(r=>r.p))].sort().map(p=>[p,p])],F.p)}
+['fm','fd','fh0','fh1','fmo','fp'].forEach(id=>$(id).onchange=e=>{const k={fm:'m',fd:'d',fh0:'h0',fh1:'h1',fmo:'mo',fp:'p'}[id];F[k]=['h0','h1'].includes(k)?+e.target.value:e.target.value;if(F.h0>F.h1)F[k=='h0'?'h1':'h0']=F[k];buildFilters();render()});
+function reset(){Object.assign(F,{m:'',d:'',h0:0,h1:23,mo:'',p:''});buildFilters();render()}
+
+function kpis(rows){
+ const t=agg(rows,()=>1).get(1)||{c:0,t:0,i:0,o:0,cw:0,cr:0,n:0,s:0,g:0,days:new Set},
+ secs=F.p?t.s:t.g,dias=t.days.size,
+ mesDias=F.m?new Date(+F.m.slice(0,4),+F.m.slice(5),0).getDate():null,
+ cache=(t.cr+t.cw+t.i)?Math.round(100*t.cr/(t.cr+t.cw+t.i)):0,
+ np=new Set(rows.map(r=>r.p)).size,nm=new Set(rows.map(r=>r.m)).size;
+ const K=(a,b,c)=>`<div class="kpi"><small>${a}</small><b>${b}</b><i>${c}</i></div>`;
+ $('kg').innerHTML=K('Gasto estimado',usd(t.c),dias?usd(t.c/dias)+' / día activo':'')+
+ K('Tokens totales',num(t.t),`↓${num(t.i)} ↑${num(t.o)} · caché ${cache}%`)+
+ K('Horas de uso',hrs(secs),F.p?'tiempo del proyecto':'tiempo activo real')+
+ K('Días activos',dias,mesDias?`de ${mesDias} días del mes`:'en el filtro')+
+ K('Mensajes',num(t.n),t.n&&dias?Math.round(t.n/dias)+' / día':'')+
+ K('Proyectos',np,'activos')+K('Modelos',nm,'usados')+
+ K('Coste / hora',secs>60?usd(t.c/(secs/3600)):'-','medio')}
+
+function render(){
+ const rows=filtered();
+ if(!rows.length){document.querySelectorAll('.pane').forEach(p=>p.querySelectorAll('.grid,.kpis,.box').forEach(e=>e.style.opacity=.3));}
+ else document.querySelectorAll('.grid,.kpis,.box').forEach(e=>e.style.opacity=1);
+ kpis(rows);const g=gran();
+ $('gr').innerHTML=[['auto','Auto'],['m','Mes'],['d','Día'],['h','Hora']].map(x=>`<button class="${GR==x[0]?'on':''}" onclick="GR='${x[0]}';render()">${x[1]}</button>`).join('')+`<span class="status" style="align-self:center">Vista: ${{m:'por mes',d:'por día',h:'por hora'}[g]}</span><button class="${window.SPL=='p'?'on':''}" onclick="window.SPL=window.SPL=='p'?'m':'p';render()" style="margin-left:auto">Desglose: ${window.SPL=='p'?'proyecto':'modelo'}</button>`;
+ const spl=window.SPL=='p'?(r=>r.p):(r=>mn(r.m));
+ let s=series(rows,g,r=>spl(r));mk('c_ts',{type:'bar',data:s,options:usdOpt()});
+ donut('c_dm',agg(rows,r=>r.m));donut('c_dp',agg(rows,r=>r.p));
+ const L=[...new Set(rows.map(r=>grKey(r,g)))].sort(),T=(k,l,c)=>({label:l,backgroundColor:c,stack:'a',data:L.map(x=>rows.filter(r=>grKey(r,g)==x).reduce((a,r)=>a+r[k],0))});
+ mk('c_tk',{type:'bar',data:{labels:L,datasets:[T('i','Entrada',COL[0]),T('o','Salida',COL[1]),T('cw','Caché escrit.',COL[2]),T('cr','Caché lect.',COL[4])]},options:stackOpt(num)});
+ const byD=[...agg(rows,r=>r.d).entries()].sort();
+ mk('c_hd',{type:'line',data:{labels:byD.map(x=>x[0]),datasets:[{label:'Horas',data:byD.map(x=>+((F.p?x[1].s:x[1].g)/3600).toFixed(2)),borderColor:COL[1],backgroundColor:al(COL[1],.15),fill:true,tension:.3,pointRadius:2}]},options:{plugins:{legend:{display:false}}}});
+ const mods=[...new Set(rows.map(r=>r.m))],prs=[...new Set(rows.map(r=>r.p))];
+ const cell=(m,p)=>rows.filter(r=>r.m==m&&r.p==p).reduce((a,r)=>a+r.c,0);
+ let mxh='<table><tr><th>Proyecto \\ Modelo</th>'+mods.map(m=>`<th>${mn(m)}</th>`).join('')+'<th>Total</th></tr>';
+ prs.sort((a,b)=>mods.reduce((x,m)=>x+cell(m,b),0)-mods.reduce((x,m)=>x+cell(m,a),0)).forEach(p=>{const tot=mods.reduce((a,m)=>a+cell(m,p),0);mxh+=`<tr><td>${p}</td>`+mods.map(m=>{const v=cell(m,p);return`<td style="background:rgba(var(--acrgb),${v?Math.min(.7,.1+v/(tot||1)*.6):0})">${v?usd(v):'·'}</td>`}).join('')+`<td><b>${usd(tot)}</b></td></tr>`});$('mx').innerHTML=mxh+'</table>';
+ modelos(rows,g);proyectos(rows,g);tiempo(rows);consumo();matrices(rows);budget();eficiencia(rows);insights(rows);calendar(rows)}
+
+function entity(rows,g,keyFn,by,title,sec){
+ const m=agg(rows,keyFn);return sorted(m).map(([k,a],i)=>{const id='e_'+sec+i;
+ const extra=Object.entries(by==='p'?a.pr:a.mo).sort((x,y)=>y[1]-x[1]).slice(0,5).map(([n,v])=>`<tr><td>${by==='p'?n:mn(n)}</td><td>${usd(v)}</td><td>${Math.round(100*v/(a.c||1))}%</td></tr>`).join('');
+ return{html:`<div class="box"><h3 style="color:${col(k)}">● ${sec=='m'?mn(k):k}</h3>
+ <div class="kpis" style="grid-template-columns:repeat(2,1fr);margin-bottom:8px"><div class="kpi"><small>Gasto</small><b>${usd(a.c)}</b></div><div class="kpi"><small>Tiempo</small><b>${hrs(a.s)}</b></div><div class="kpi"><small>Tokens</small><b>${num(a.t)}</b><i>${a.n} msgs</i></div><div class="kpi"><small>Días</small><b>${a.days.size}</b></div></div>
+ <div class="cv"><canvas id="${id}"></canvas></div><div class="scroll"><table><tr><th>${title}</th><th>Gasto</th><th>%</th></tr>${extra}</table></div></div>`,id,k}})}
+function paint(list,rows,g,keyFn,spl){list.forEach(e=>{const sub=rows.filter(r=>keyFn(r)==e.k);mk(e.id,{type:'bar',data:series(sub,g,spl),options:usdOpt()})})}
+
+function modelos(rows,g){const l=entity(rows,g,r=>r.m,'p','Proyecto','m');$('cm').innerHTML=l.map(x=>x.html).join('')||'<div class="empty">Sin datos</div>';paint(l,rows,g,r=>r.m,r=>r.p)}
+function proyectos(rows,g){
+ const m=agg(rows,r=>r.p);let h='<table><tr><th>Proyecto</th><th>Gasto</th><th>Tokens</th><th>Tiempo</th><th>Días</th><th>Msgs</th><th>Modelo principal</th></tr>';
+ sorted(m).forEach(([p,a])=>h+=`<tr class="cl" onclick="F.p='${p.replace(/'/g,"\\'")}';buildFilters();render()"><td>${p}</td><td>${usd(a.c)}</td><td>${num(a.t)}</td><td>${hrs(a.s)}</td><td>${a.days.size}</td><td>${a.n}</td><td>${mn(topKey(a.mo))}</td></tr>`);
+ $('tp').innerHTML=h+'</table>';
+ const l=entity(rows,g,r=>r.p,'m','Modelo','p').slice(0,8);$('cp').innerHTML=l.map(x=>x.html).join('');paint(l,rows,g,r=>r.p,r=>mn(r.m))}
+
+function tiempo(rows){
+ const H=[...Array(24).keys()],hh=agg(rows,r=>r.h),wk=agg(rows,r=>wd(r.d)),mo=agg(rows,r=>r.d.slice(0,7));
+ const sec=a=>F.p?a.s:a.g;
+ mk('t_h',{type:'bar',data:{labels:H.map(h=>h+'h'),datasets:[{label:'USD',data:H.map(h=>+(hh.get(h)?.c||0).toFixed(2)),backgroundColor:COL[0],borderRadius:3}]},options:{plugins:{legend:{display:false}}}});
+ mk('t_w',{type:'bar',data:{labels:DOW,datasets:[{label:'USD',data:DOW.map((_,i)=>+(wk.get(i)?.c||0).toFixed(2)),backgroundColor:COL[1],borderRadius:3}]},options:{plugins:{legend:{display:false}}}});
+ const ml=[...mo.keys()].sort();mk('t_m',{type:'bar',data:{labels:ml,datasets:[{label:'Horas',data:ml.map(k=>+(sec(mo.get(k))/3600).toFixed(1)),backgroundColor:COL[2],borderRadius:3}]},options:{plugins:{legend:{display:false}}}});
+ mk('t_a',{type:'line',data:{labels:H.map(h=>h+'h'),datasets:[{label:'min',data:H.map(h=>+((hh.get(h)?sec(hh.get(h)):0)/60).toFixed(0)),borderColor:COL[3],fill:true,backgroundColor:al(COL[3],.15),tension:.3}]},options:{plugins:{legend:{display:false}}}});
+ const hw={};rows.forEach(r=>{const k=wd(r.d)+'_'+r.h;hw[k]=(hw[k]||0)+r.c});
+ heat('hw',DOW.map((d,i)=>i),H,(i,h)=>hw[i+'_'+h]||0,usd);
+ document.querySelectorAll('#hw .l').forEach(e=>{if(DOW[+e.textContent]!==undefined&&e.textContent.length==1)e.textContent=DOW[+e.textContent]});
+ const days=[...new Set(rows.map(r=>r.d))].sort().reverse().slice(0,31),dh={};rows.forEach(r=>{const k=r.d+'_'+r.h;dh[k]=(dh[k]||0)+r.c});
+ heat('hd',days,H,(d,h)=>dh[d+'_'+h]||0,usd);
+ const dd=agg(rows,r=>r.d);let t='<table><tr><th>Fecha</th><th>Gasto</th><th>Tokens</th><th>Tiempo</th><th>Horas activas</th><th>Modelo</th><th>Proyecto</th></tr>';
+ [...dd.entries()].sort().reverse().forEach(([d,a])=>{const hs=new Set(rows.filter(r=>r.d==d).map(r=>r.h)).size;t+=`<tr><td>${d} ${DOW[wd(d)]}</td><td>${usd(a.c)}</td><td>${num(a.t)}</td><td>${hrs(F.p?a.s:a.g)}</td><td>${hs}</td><td>${mn(topKey(a.mo))}</td><td>${topKey(a.pr)}</td></tr>`});$('td').innerHTML=t+'</table>'}
+
+const IC={"eficiencia":"<path d=\"M13 2L4 14h7l-1 8 9-12h-7z\"/>","general": "<path d=\"M3 3v18h18\"/><path d=\"M7 15l4-5 3 3 5-7\"/>", "modelos": "<rect x=\"5\" y=\"7\" width=\"14\" height=\"11\" rx=\"2\"/><path d=\"M12 7V4M9 12h.01M15 12h.01\"/>", "proyectos": "<path d=\"M3 7a2 2 0 0 1 2-2h4l2 2h8a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z\"/>", "consumo": "<circle cx=\"12\" cy=\"12\" r=\"9\"/><path d=\"M12 7v5l3 2\"/>", "tiempo": "<rect x=\"3\" y=\"5\" width=\"18\" height=\"16\" rx=\"2\"/><path d=\"M8 3v4M16 3v4M3 11h18\"/>", "matrices": "<rect x=\"4\" y=\"4\" width=\"6\" height=\"6\"/><rect x=\"14\" y=\"4\" width=\"6\" height=\"6\"/><rect x=\"4\" y=\"14\" width=\"6\" height=\"6\"/><rect x=\"14\" y=\"14\" width=\"6\" height=\"6\"/>"};
+const TITLES={general:'Visión general',modelos:'Análisis por modelo',proyectos:'Análisis por proyecto',consumo:'Consumo y presupuesto',eficiencia:'Eficiencia y ahorro',tiempo:'Análisis por tiempo',matrices:'Matrices cruzadas'};
+[['general','General'],['modelos','Por modelo'],['proyectos','Por proyecto'],['consumo','Consumo'],['eficiencia','Eficiencia'],['tiempo','Por tiempo'],['matrices','Matrices']].forEach(([k,l])=>{const b=document.createElement('button');b.innerHTML=`<svg viewBox="0 0 24 24">${IC[k]}</svg><span>${l}</span>`;b.className=k==TAB?'on':'';b.onclick=()=>{TAB=k;$('ttl').textContent=TITLES[k];document.querySelectorAll('.tabs button').forEach(x=>x.classList.toggle('on',x==b));document.querySelectorAll('.pane').forEach(p=>p.classList.toggle('on',p.id=='p-'+k));render()};$('tabs').appendChild(b)});
+function applyFx(){const f=CFG.cur==='EUR'?CFG.fx:1;RAW=RAW0.map(r=>({...r,c:r.c*f,ki:(r.ki||0)*f,ko:(r.ko||0)*f,kw:(r.kw||0)*f,kr:(r.kr||0)*f}))}
+function openCfg(){$('c_lim').value=CFG.lim;$('c_cur').value=CFG.cur;$('c_fx').value=CFG.fx;prevTheme=CFG.theme;buildThemes();$('c_rf').value=CFG.rf;$('cfg').classList.add('on')}
+function closeCfg(){$('cfg').classList.remove('on')}
+function saveCfg(){CFG.lim=+$('c_lim').value||0;CFG.cur=$('c_cur').value;CFG.fx=+$('c_fx').value||1;CFG.rf=+$('c_rf').value;setTimer();localStorage.setItem('cfg',JSON.stringify(CFG));closeCfg();applyFx();applyTheme();if(RAW.length){buildFilters();render()}}
+let ldT;
+function showLoader(){const l=$('ld');l.classList.remove('err');l.classList.add('on');$('ldm').textContent='Leyendo registros de Claude Code…';let s=0;clearInterval(ldT);$('ldt').textContent='0 s';
+ ldT=setInterval(()=>{s++;$('ldt').textContent=s+' s';if(s==6)$('ldm').textContent='Procesando mensajes y calculando costes…';if(s==18)$('ldm').textContent='La primera lectura es la más lenta; las siguientes serán casi instantáneas.'},1000)}
+function hideLoader(){clearInterval(ldT);$('ld').classList.remove('on')}
+function loaderError(e){clearInterval(ldT);$('ld').classList.add('err');$('ldh').textContent='No se pudieron cargar los datos';$('ldm').textContent=String(e)}
+function setTimer(){clearInterval(timer);$('st').textContent=$('st').textContent.replace(/auto-refresco: .*/,'auto-refresco: '+rfTxt(CFG.rf));if(CFG.rf>0)timer=setInterval(()=>load(true),CFG.rf*60000)}
+const rfTxt=m=>m?(m>=60?m/60+' h':m+' min'):'desactivado';
+
+function insights(rows){const el=$('ins');if(!rows.length){el.innerHTML='';return}
+ const t=agg(rows,()=>1).get(1),b=m=>sorted(m)[0],pc=(a,c)=>c?Math.round(100*a/c)+'% del gasto':'',
+ H=b(agg(rows,r=>r.h)),W=b(agg(rows,r=>wd(r.d))),D=b(agg(rows,r=>r.d)),P=b(agg(rows,r=>r.p)),M=b(agg(rows,r=>r.m)),
+ S=k=>rows.reduce((a,r)=>a+(r[k]||0),0),ahorro=S('kr')*9-S('kw')*0.2,
+ days=[...new Set(RAW.map(r=>r.d))].sort();let racha=days.length?1:0;for(let i=days.length-1;i>0;i--){const a=new Date(days[i]+'T12:00:00'),c=new Date(days[i-1]+'T12:00:00');if(Math.round((a-c)/864e5)===1)racha++;else break}
+ const m=mes(),dv=m.prev>0?(m.tot-m.prev)/m.prev*100:null,hh=n=>String(n).padStart(2,'0')+':00';
+ const C=(c,a,v,d)=>`<div class="ins"><span class="dot" style="background:${c}"></span><div><small>${a}</small><b>${v}</b><i>${d}</i></div></div>`;
+ el.innerHTML=C(COL[0],'Hora pico',hh(H[0])+' – '+hh((+H[0]+1)%24),pc(H[1].c,t.c))+C(COL[1],'Día más activo',['Lunes','Martes','Miércoles','Jueves','Viernes','Sábado','Domingo'][W[0]],pc(W[1].c,t.c))+
+ C(COL[2],'Proyecto líder',P[0],pc(P[1].c,t.c)+' · '+usd(P[1].c))+C(COL[3],'Modelo dominante',mn(M[0]),pc(M[1].c,t.c)+' · '+usd(M[1].c))+
+ C(COL[5],'Día más caro',D[0],usd(D[1].c))+C(COL[4],'Racha de uso',racha+(racha==1?' día':' días')+' seguidos','hasta el último día con actividad')+
+ C('#12b886','Ahorro neto por caché',usd(ahorro),'frente a pagar todo como entrada')+C(dv>0?'#e03131':'#12b886','Vs mes anterior',dv===null?'—':(dv>0?'▲ ':'▼ ')+Math.abs(dv).toFixed(0)+'%','mismo periodo del mes anterior')}
+
+function calendar(rows){const el=$('cal'),by={};rows.forEach(r=>by[r.d]=(by[r.d]||0)+r.c);const ds=Object.keys(by).sort();if(!ds.length){el.innerHTML='<div class="empty">Sin datos</div>';return}
+ const end=new Date(ds[ds.length-1]+'T12:00:00'),st=new Date(end);st.setDate(end.getDate()-((end.getDay()+6)%7)-25*7);const max=Math.max(...Object.values(by)),iso=d=>d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');
+ let h='<div class="cal">';for(let w=0;w<26;w++){h+='<div class="calw">';for(let d=0;d<7;d++){const dt=new Date(st);dt.setDate(st.getDate()+w*7+d);const k=iso(dt),v=by[k]||0;h+=`<i title="${k} · ${usd(v)}" style="${dt>end?'visibility:hidden':v?`background:rgba(var(--acrgb),${(.2+.8*v/max).toFixed(2)})`:''}"></i>`}h+='</div>'}
+ el.innerHTML=h+'</div><div class="callegend">Menos '+[.2,.4,.6,.8,1].map(a=>`<i style="background:rgba(var(--acrgb),${a})"></i>`).join('')+' Más · cada columna es una semana (lunes a domingo)</div>'}
+
+function eficiencia(rows){const t=agg(rows,()=>1).get(1)||{c:0,t:0,i:0,o:0,cw:0,cr:0,n:0,s:0,g:0},S=k=>rows.reduce((a,r)=>a+(r[k]||0),0),
+ ki=S('ki'),ko=S('ko'),kw=S('kw'),kr=S('kr'),ahorro=kr*9-kw*0.2,hit=(t.cr+t.cw+t.i)?100*t.cr/(t.cr+t.cw+t.i):0,secs=F.p?t.s:t.g,
+ K=(a,b,c,k='')=>`<div class="kpi ${k}"><small>${a}</small><b>${b}</b><i>${c}</i></div>`;
+ $('ke').innerHTML=K('Ahorro neto por caché',usd(ahorro),'sin caché costaría '+usd(t.c+ahorro),'ok')+K('Eficiencia de caché',hit.toFixed(1)+'%','tokens leídos desde caché',hit>70?'ok':'warn')+K('Coste por mensaje',usd(t.n?t.c/t.n:0),t.n+' mensajes')+K('Coste por 1M tokens',usd(t.t?t.c/t.t*1e6:0),'mezcla de todos los tipos')+K('Salida por mensaje',num(t.n?t.o/t.n:0),'tokens generados')+K('Mensajes por hora',secs>60?(t.n/(secs/3600)).toFixed(0):'-','ritmo de trabajo activo');
+ mk('e_tipo',{type:'doughnut',data:{labels:['Entrada','Salida','Caché escritura','Caché lectura'],datasets:[{data:[ki,ko,kw,kr].map(v=>+v.toFixed(2)),backgroundColor:[COL[0],COL[1],COL[2],COL[4]],borderWidth:0}]},options:{cutout:'62%',plugins:{legend:{position:'right',labels:{boxWidth:10}},tooltip:{callbacks:{label:c=>c.label+': '+usd(c.parsed)}}}}});
+ const g=gran(),L=[...new Set(rows.map(r=>grKey(r,g)))].sort(),by=fn=>L.map(l=>fn(rows.filter(r=>grKey(r,g)==l)));
+ mk('e_cache',{type:'line',data:{labels:L,datasets:[{label:'% caché',data:by(rs=>{const a=rs.reduce((x,r)=>x+r.cr,0),d=rs.reduce((x,r)=>x+r.cr+r.cw+r.i,0);return d?+(100*a/d).toFixed(1):0}),borderColor:COL[4],backgroundColor:al(COL[4],.15),fill:true,tension:.3,pointRadius:2}]},options:{plugins:{legend:{display:false}},scales:{y:{min:0,max:100,ticks:{callback:v=>v+'%'}}}}});
+ mk('e_cpm',{type:'line',data:{labels:L,datasets:[{label:'Coste/mensaje',data:by(rs=>{const n=rs.reduce((x,r)=>x+r.n,0);return n?+(rs.reduce((x,r)=>x+r.c,0)/n).toFixed(4):0}),borderColor:COL[3],backgroundColor:al(COL[3],.12),fill:true,tension:.3,pointRadius:2}]},options:{plugins:{legend:{display:false},tooltip:{callbacks:{label:c=>usd(c.parsed.y)}}}}});
+ const me=sorted(agg(rows,r=>r.m));mk('e_mod',{type:'bar',data:{labels:me.map(x=>mn(x[0])),datasets:[{data:me.map(x=>+(x[1].n?x[1].c/x[1].n:0).toFixed(4)),backgroundColor:me.map(x=>col(x[0])),borderRadius:6}]},options:{plugins:{legend:{display:false},tooltip:{callbacks:{label:c=>usd(c.parsed.y)}}}}});
+ const pe=sorted(agg(rows,r=>r.p)).slice(0,15),tot=sorted(agg(rows,r=>r.p)).reduce((a,x)=>a+x[1].c,0);let acc=0;
+ mk('e_par',{data:{labels:pe.map(x=>x[0]),datasets:[{type:'line',label:'% acumulado',yAxisID:'y1',data:pe.map(x=>{acc+=x[1].c;return +(100*acc/(tot||1)).toFixed(1)}),borderColor:COL[2],pointRadius:3,tension:.2},{type:'bar',label:'Gasto',data:pe.map(x=>+x[1].c.toFixed(2)),backgroundColor:pe.map(x=>col(x[0])),borderRadius:5}]},options:{plugins:{legend:{position:'bottom'}},scales:{y1:{position:'right',min:0,max:100,grid:{drawOnChartArea:false},ticks:{callback:v=>v+'%'}}}}});
+ const dt=[...agg(rows,r=>r.d).entries()].sort((a,b)=>b[1].c-a[1].c).slice(0,10);mk('e_top',{type:'bar',data:{labels:dt.map(x=>x[0]),datasets:[{data:dt.map(x=>+x[1].c.toFixed(2)),backgroundColor:COL[5],borderRadius:5}]},options:{plugins:{legend:{display:false},tooltip:{callbacks:{label:c=>usd(c.parsed.y)}}}}})}
+
+const BASE=['#84cc16','#fb923c','#22d3ee','#e879f9','#eab308','#94a3b8'];
+const THEMES=[
+{id:'auto',n:'Automático',sw:['linear-gradient(135deg,#f3f5fb 50%,#0a0f24 50%)','#fff','#6b7bff']},
+{id:'light',n:'Claro',sw:['#f3f5fb','#fff','#3b5bdb'],pal:['#4f6bed','#14b8a6','#f59e0b','#ef4468','#38bdf8','#a78bfa']},
+{id:'dark',n:'Oscuro',sw:['#0a0f24','#111a38','#7c93ff'],pal:['#7c93ff','#2dd4bf','#fbbf24','#fb7185','#38bdf8','#c4b5fd']},
+{id:'midnight',n:'Medianoche',sw:['#050816','#0d1330','#5b8cff'],pal:['#5b8cff','#a78bfa','#22d3ee','#f472b6','#34d399','#fbbf24']},
+{id:'ocean',n:'Océano',sw:['#04141a','#0f3340','#22d3ee'],pal:['#22d3ee','#2dd4bf','#60a5fa','#a3e635','#fbbf24','#f472b6']},
+{id:'sunset',n:'Atardecer',sw:['#160d1f','#2e1a40','#ff8a4c'],pal:['#ff8a4c','#f472b6','#fbbf24','#c084fc','#fb7185','#2dd4bf']},
+{id:'graphite',n:'Grafito',sw:['#121212','#262629','#fbbf24'],pal:['#fbbf24','#94a3b8','#60a5fa','#34d399','#f87171','#c4b5fd']},
+{id:'corporate',n:'Corporativo',sw:['#f2f4f8','#0b2545','#0b5cab'],pal:['#0b5cab','#2a9d8f','#e9a23b','#c8553d','#4a90d9','#7a6fb5']},
+{id:'forest',n:'Bosque',sw:['#f0f6f1','#1b4332','#1f8a4c'],pal:['#1f8a4c','#2a9d8f','#e9a23b','#c8553d','#6aa84f','#7a6fb5']},
+{id:'lavender',n:'Lavanda',sw:['#f6f3fb','#3b2370','#7c4dff'],pal:['#7c4dff','#14b8a6','#f59e0b','#ec4899','#38bdf8','#a78bfa']},
+{id:'contrast',n:'Alto contraste',sw:['#000','#171717','#ffe600'],pal:['#ffe600','#00e5ff','#ff4081','#00ff9c','#ff9100','#b388ff']}];
+let prevTheme='auto';
+const sysDark=()=>matchMedia('(prefers-color-scheme:dark)').matches;
+const effTheme=()=>CFG.theme==='auto'?(sysDark()?'dark':'light'):CFG.theme;
+const al=(hex,a)=>{const n=parseInt(hex.slice(1),16);return `rgba(${n>>16},${n>>8&255},${n&255},${a})`};
+function applyTheme(){const r=document.documentElement;CFG.theme==='auto'?r.removeAttribute('data-theme'):r.dataset.theme=CFG.theme;
+ if(!THEMES.some(t=>t.id===CFG.theme))CFG.theme='auto';
+ const t=THEMES.find(x=>x.id===effTheme());COL.splice(0,COL.length,...t.pal,...BASE);buildColors();
+ const cs=getComputedStyle(r);Chart.defaults.color=cs.getPropertyValue('--mu').trim();Chart.defaults.borderColor=cs.getPropertyValue('--bd').trim();if(RAW.length)render()}
+function toast(m){let t=$('toast');if(!t){t=document.createElement('div');t.id='toast';t.className='toast';document.body.appendChild(t)}t.textContent=m;t.classList.add('on');clearTimeout(t._h);t._h=setTimeout(()=>t.classList.remove('on'),1800)}
+function toggleTheme(){const ids=THEMES.filter(t=>t.id!=='auto').map(t=>t.id);CFG.theme=ids[(ids.indexOf(effTheme())+1)%ids.length];localStorage.setItem('cfg',JSON.stringify(CFG));applyTheme();toast('Tema: '+THEMES.find(t=>t.id===CFG.theme).n)}
+function buildThemes(){$('thg').innerHTML=THEMES.map(t=>`<button type="button" class="thc ${CFG.theme===t.id?'on':''}" onclick="pickTheme('${t.id}')"><span class="sw" style="background:${t.sw[0]}"><i style="background:${t.sw[1]}"></i><u style="background:${t.sw[2]}"></u></span>${t.n}</button>`).join('')}
+function pickTheme(id){CFG.theme=id;applyTheme();buildThemes()}
+function cancelCfg(){CFG.theme=prevTheme;applyTheme();closeCfg()}
+
+$('cfg').onclick=e=>{if(e.target.id==='cfg')cancelCfg()};
+function mes(){const n=new Date(),ym=n.getFullYear()+'-'+String(n.getMonth()+1).padStart(2,'0'),dim=new Date(n.getFullYear(),n.getMonth()+1,0).getDate(),dn=n.getDate(),rs=RAW.filter(r=>r.d.startsWith(ym)),tot=rs.reduce((a,r)=>a+r.c,0);
+ const pm=new Date(n.getFullYear(),n.getMonth()-1,1),pym=pm.getFullYear()+'-'+String(pm.getMonth()+1).padStart(2,'0'),prev=RAW.filter(r=>r.d.startsWith(pym)&&+r.d.slice(8)<=dn).reduce((a,r)=>a+r.c,0);
+ return{prev,ym,dim,dn,rs,tot,pct:CFG.lim?tot/CFG.lim*100:0,rest:Math.max(CFG.lim-tot,0),rate:tot/dn,proy:tot/dn*dim}}
+function budget(){const m=mes(),cl=m.pct>90?'bad':m.pct>70?'warn':'';
+ $('bud').innerHTML=`Presupuesto del mes<b>${usd(m.tot)} / ${usd(CFG.lim)}</b><div class="bar"><i class="${cl}" style="width:${Math.min(m.pct,100)}%"></i></div><div style="margin-top:6px">${m.pct.toFixed(0)}% usado · quedan ${usd(m.rest)}</div>`}
+function consumo(){const m=mes(),K=(a,b,c,k='')=>`<div class="kpi ${k}"><small>${a}</small><b>${b}</b><i>${c}</i></div>`,over=m.proy>CFG.lim&&CFG.lim>0,left=m.dim-m.dn;
+ let agota='No se agota este mes';if(m.rate>0&&over){const d=Math.ceil(CFG.lim/m.rate);if(d<=m.dim)agota='Día '+d+' del mes'}
+ $('kc').innerHTML=K('Consumido este mes',usd(m.tot),m.pct.toFixed(1)+'% del presupuesto',m.pct>90?'bad':m.pct>70?'warn':'ok')+K('Presupuesto',usd(CFG.lim),CFG.cur)+K('Disponible',usd(m.rest),left>0?usd(m.rest/left)+' / día restante':'último día')+K('Proyección fin de mes',usd(m.proy),over?'Supera el presupuesto':'Dentro del presupuesto',over?'bad':'ok')+K('Ritmo diario',usd(m.rate),'media del mes')+K('Agotamiento estimado',agota,'al ritmo actual',over?'warn':'')+(m.prev>0?K('Vs mes anterior',(m.tot>=m.prev?'▲ ':'▼ ')+Math.abs((m.tot-m.prev)/m.prev*100).toFixed(0)+'%','mismo periodo: '+usd(m.prev),m.tot>m.prev?'warn':'ok'):'');
+ mk('c_g',{type:'doughnut',data:{labels:['Consumido','Disponible'],datasets:[{data:[+m.tot.toFixed(2),+m.rest.toFixed(2)],backgroundColor:[m.pct>90?'#e03131':m.pct>70?'#f59f00':COL[0],'rgba(148,163,184,.25)'],borderWidth:0}]},options:{cutout:'72%',circumference:240,rotation:-120,plugins:{legend:{position:'bottom'},tooltip:{callbacks:{label:c=>c.label+': '+usd(c.parsed)}}}}});
+ const pe=sorted(agg(m.rs,r=>r.p)).slice(0,8);mk('c_cp',{type:'bar',data:{labels:pe.map(x=>x[0]),datasets:[{data:pe.map(x=>+x[1].c.toFixed(2)),backgroundColor:pe.map(x=>col(x[0])),borderRadius:5}]},options:{indexAxis:'y',plugins:{legend:{display:false},tooltip:{callbacks:{label:c=>usd(c.parsed.x)}}}}});
+ const D=[...Array(m.dim).keys()].map(i=>i+1),by={};m.rs.forEach(r=>{const d=+r.d.slice(8);by[d]=(by[d]||0)+r.c});let c=0;
+ const real=D.map(d=>{c+=by[d]||0;return d<=m.dn?+c.toFixed(2):null}),proy=D.map(d=>d>=m.dn?+(m.rate*d).toFixed(2):null),ideal=D.map(d=>+(CFG.lim*d/m.dim).toFixed(2));
+ mk('c_ac',{type:'line',data:{labels:D,datasets:[{label:'Real',data:real,borderColor:COL[0],backgroundColor:al(COL[0],.15),fill:true,tension:.25,pointRadius:2},{label:'Proyección',data:proy,borderColor:COL[2],borderDash:[6,4],pointRadius:0},{label:'Ritmo de presupuesto',data:ideal,borderColor:'#94a3b8',borderDash:[2,4],pointRadius:0}]},options:{plugins:{legend:{position:'bottom'}},scales:{y:{ticks:{callback:v=>v+' '+SYM()}}}}})}
+function mtx(el,R,C,get,f){let max=0;const V=R.map(r=>C.map(c=>{const v=get(r[0],c[0]);if(v>max)max=v;return v}));
+ let h=`<table class="mx"><tr><th>&nbsp;</th>${C.map(c=>`<th>${c[1]}</th>`).join('')}<th>Total</th></tr>`;
+ R.forEach((r,i)=>{h+=`<tr><td>${r[1]}</td>${V[i].map(v=>`<td style="background:${v?`rgba(var(--acrgb),${(.08+.6*v/max).toFixed(2)})`:'transparent'}">${v?f(v):'·'}</td>`).join('')}<td><b>${f(V[i].reduce((a,b)=>a+b,0))}</b></td></tr>`});
+ $(el).innerHTML=R.length?h+'</table>':'<div class="empty">Sin datos</div>'}
+function matrices(rows){const tk=r=>F.m||F.d?r.d:r.d.slice(0,7),T=[...new Set(rows.map(tk))].sort().reverse().slice(0,40).map(x=>[x,x]),
+ M=[...new Set(rows.map(r=>r.m))].sort().map(x=>[x,mn(x)]),pt=sorted(agg(rows,r=>r.p)).slice(0,8).map(x=>[x[0],x[0]]);
+ const sum=(fn,v)=>(a,b)=>rows.reduce((s,r)=>fn(r,a,b)?s+(typeof v==='function'?v(r):r[v]):s,0),tok=r=>r.i+r.o+r.cw+r.cr;
+ mtx('m1',T,M,sum((r,t,m)=>tk(r)===t&&r.m===m,'c'),usd);
+ mtx('m2',pt,M,sum((r,p,m)=>r.p===p&&r.m===m,'s'),v=>hrs(v));
+ mtx('m3',T,pt,sum((r,t,p)=>tk(r)===t&&r.p===p,tok),num);
+ mtx('m4',T,M,sum((r,t,m)=>tk(r)===t&&r.m===m,tok),num)}
+applyTheme();
+
+async function load(silent){if(!silent)showLoader();try{const r=await fetch('/api/data');if(!r.ok)throw new Error('HTTP '+r.status);const d=await r.json();RAW0=d.rows||[];applyFx();buildColors();
+ $('st').textContent=RAW0.length?`${d.archivos} archivos · ${d.mensajes} mensajes · actualizado ${new Date().toLocaleTimeString()} · auto-refresco: ${rfTxt(CFG.rf)}`:'No se han encontrado datos de uso. Revisa la consola del servidor.';
+ buildFilters();render();hideLoader()}catch(e){$('st').textContent='Error: '+e;if(!silent)loaderError(e)}}
+setTimer();load();
+</script></body></html>
