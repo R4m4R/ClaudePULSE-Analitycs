@@ -1,6 +1,6 @@
-# ClaudeCode_Analitycs
+# ClaudeScope
 Dashboard de status, metricas i graficas de tu aplicacion ClaudeCode (realizado para win)
-📊 Claude Code Session Dashboard
+📊 Claude SCOPE Session Dashboard
 
 Dashboard de monitorización con **auto-refresh ** diseñado para visualizar, analizar y auditar toda la actividad e historial de tus sesiones en **Claude Code**.
 
