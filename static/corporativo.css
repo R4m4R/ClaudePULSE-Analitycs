@@ -1,0 +1,48 @@
+/* Tema CORPORATIVO: sobrio y formal. Barra superior, esquinas rectas, sin sombras, tablas con rejilla. */
+:root[data-theme=corporate]{--bg:#e8ecf0;--card:#fff;--card2:#f2f5f8;--bd:#c3ccd6;--tx:#15202b;--mu:#566574;--ac:#0b4f8a;--acrgb:11,79,138;--ac2:#0b4f8a;--sac:#8ec1ee;--sacrgb:142,193,238;--ok:#2e7d32;--warn:#d68910;--bad:#b03a2e;--sh:none;--side:#0a2540;--glass:#fff;--r:2px;--font:'Segoe UI',Arial,'Helvetica Neue',sans-serif}
+[data-theme=corporate] body{font-size:13px}
+/* Barra de navegación superior */
+[data-theme=corporate] .app{display:block}
+[data-theme=corporate] .side{position:sticky;top:0;left:auto;bottom:auto;inset:auto;width:100%;height:54px;flex-direction:row;align-items:center;gap:26px;padding:0 26px;background:var(--side);border-bottom:3px solid #1c6fb8;overflow:visible}
+[data-theme=corporate] .brand{padding:0;gap:10px}[data-theme=corporate] .brand small{display:none}
+[data-theme=corporate] .logo{width:28px;height:28px;border-radius:2px;background:#fff;color:#0a2540;box-shadow:none;font-size:.9rem}
+[data-theme=corporate] .tabs{flex-direction:row;gap:0;flex:1;height:100%}
+[data-theme=corporate] .tabs button{width:auto;height:100%;padding:0 16px;border-radius:0;color:#b4c4d6;font-weight:500;font-size:.85rem;border-bottom:3px solid transparent;margin-bottom:-3px}
+[data-theme=corporate] .tabs button svg{width:15px;height:15px}
+[data-theme=corporate] .tabs button:hover{background:rgba(255,255,255,.07)}
+[data-theme=corporate] .tabs button.on{background:rgba(255,255,255,.1);box-shadow:none;border-bottom-color:#fff;color:#fff}
+[data-theme=corporate] .side-foot{display:flex;flex-direction:row;padding:0;border:0;gap:10px;align-items:center}
+[data-theme=corporate] .budget{display:none}
+[data-theme=corporate] .ghost{border-radius:2px;padding:6px 12px;font-size:.78rem}
+[data-theme=corporate] .main{margin:0 auto;max-width:1600px;padding:20px 28px 40px}
+/* Cabecera y filtros */
+[data-theme=corporate] .hdr h1{font-size:1.3rem;font-weight:600;letter-spacing:0;border-left:4px solid var(--ac);padding-left:12px}
+[data-theme=corporate] .filters{position:static;background:#fff;border:1px solid var(--bd);border-radius:2px;box-shadow:none;backdrop-filter:none;-webkit-backdrop-filter:none;padding:10px 12px}
+[data-theme=corporate] .filters label{font-size:.64rem;color:var(--mu)}
+[data-theme=corporate] select,[data-theme=corporate] input,[data-theme=corporate] button{border-radius:2px}
+[data-theme=corporate] select:focus,[data-theme=corporate] input:focus{box-shadow:0 0 0 2px rgba(11,79,138,.25)}
+[data-theme=corporate] .pri{background:var(--ac);border-color:var(--ac)}
+/* Tarjetas planas con borde fino */
+[data-theme=corporate] .box,[data-theme=corporate] .kpi,[data-theme=corporate] .ins,[data-theme=corporate] .bgt,[data-theme=corporate] .dbox,[data-theme=corporate] .mbox,[data-theme=corporate] .thc,[data-theme=corporate] .cl2{border-radius:2px;box-shadow:none}
+[data-theme=corporate] .kpi{padding:14px 16px}[data-theme=corporate] .kpi:hover,[data-theme=corporate] .ins:hover{transform:none}
+[data-theme=corporate] .kpi::before{inset:0 0 auto 0;width:auto;height:3px;background:var(--ac)}
+[data-theme=corporate] .kpi.ok::before{background:var(--ok)}[data-theme=corporate] .kpi.warn::before{background:var(--warn)}[data-theme=corporate] .kpi.bad::before{background:var(--bad)}
+[data-theme=corporate] .kpi b{font-weight:600;letter-spacing:0}
+[data-theme=corporate] .box{padding:14px 16px}
+[data-theme=corporate] .bh{border-bottom:1px solid var(--bd);padding-bottom:8px;margin-bottom:12px}
+[data-theme=corporate] h3{text-transform:none;letter-spacing:0;font-size:.92rem;font-weight:600;color:var(--tx);padding-top:2px}
+[data-theme=corporate] .sec{font-size:.95rem;font-weight:600;text-transform:uppercase;letter-spacing:.06em;color:var(--ac)}
+[data-theme=corporate] .ins .dot{border-radius:1px;box-shadow:none}
+/* Controles segmentados rectos */
+[data-theme=corporate] .seg,[data-theme=corporate] .seg button,[data-theme=corporate] .sub button{border-radius:2px}
+[data-theme=corporate] .seg button.on{box-shadow:none}
+/* Tablas con rejilla y cebra */
+[data-theme=corporate] table th,[data-theme=corporate] table td{border:1px solid #d5dce4}
+[data-theme=corporate] th{background:#e3e9ef;color:#233140;font-size:.66rem}
+[data-theme=corporate] tbody tr:nth-child(even) td:not([style]){background:#f7f9fb}
+[data-theme=corporate] .bgt-bar,[data-theme=corporate] .bgt-bar i,[data-theme=corporate] .bar,[data-theme=corporate] .bar i{border-radius:1px}
+[data-theme=corporate] .bgt-bar{height:14px}
+[data-theme=corporate] .calw i,[data-theme=corporate] .hm div,[data-theme=corporate] .callegend i{border-radius:1px}
+[data-theme=corporate] .pane.on{animation:none}
+[data-theme=corporate] .ldbox,[data-theme=corporate] .spin{border-radius:2px}[data-theme=corporate] .ldbox{background:rgba(10,37,64,.92)}
+@media(max-width:1000px){[data-theme=corporate] .side{height:auto;min-height:50px;gap:12px;padding:0 12px;overflow-x:auto}[data-theme=corporate] .tabs button{height:50px;padding:0 12px;white-space:nowrap}[data-theme=corporate] .side-foot{display:none}[data-theme=corporate] .main{padding:14px}}

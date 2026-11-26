@@ -1,0 +1,48 @@
+/* Tema MODERNO: cristal translúcido, malla de degradados, barra lateral flotante, formas muy redondeadas y tipografía grande. */
+:root[data-theme=modern]{color-scheme:dark;--bg:#080a18;--card:rgba(255,255,255,.055);--card2:rgba(255,255,255,.085);--bd:rgba(255,255,255,.13);--tx:#f4f6ff;--mu:#a7b0d6;--ac:#8b6cff;--acrgb:139,108,255;--ac2:#00e5c8;--sac:#b3a6ff;--sacrgb:179,166,255;--ok:#2ee6a6;--warn:#ffc247;--bad:#ff5c7a;--sh:0 10px 40px rgba(0,0,0,.38);--side:rgba(255,255,255,.06);--glass:rgba(14,16,38,.55);--r:26px;--font:'Segoe UI Variable','Segoe UI',system-ui,sans-serif}
+[data-theme=modern] body{background:radial-gradient(900px 620px at 6% -8%,rgba(139,108,255,.38),transparent 60%),radial-gradient(820px 580px at 102% 8%,rgba(0,229,200,.24),transparent 56%),radial-gradient(760px 540px at 45% 112%,rgba(255,92,168,.22),transparent 60%),#080a18;background-attachment:fixed}
+/* Barra lateral flotante tipo cristal */
+[data-theme=modern] .side{inset:16px auto 16px 16px;width:236px;border-radius:32px;border:1px solid var(--bd);background:var(--side);-webkit-backdrop-filter:blur(24px);backdrop-filter:blur(24px);box-shadow:var(--sh);padding:22px 12px}
+[data-theme=modern] .main{margin-left:282px;padding:30px 30px 50px}
+[data-theme=modern] .logo{border-radius:18px;background:linear-gradient(135deg,#8b6cff,#00e5c8);box-shadow:0 8px 28px rgba(139,108,255,.55)}
+[data-theme=modern] .tabs button{border-radius:18px;padding:13px 16px;font-weight:600}
+[data-theme=modern] .tabs button.on{background:linear-gradient(135deg,rgba(139,108,255,.6),rgba(0,229,200,.32));box-shadow:0 10px 28px rgba(139,108,255,.28);color:#fff}
+[data-theme=modern] .budget{border-radius:20px;background:rgba(255,255,255,.07);border:1px solid var(--bd)}
+[data-theme=modern] .bar,[data-theme=modern] .bar i{border-radius:20px}
+[data-theme=modern] .ghost{border-radius:16px}
+/* Cabecera grande con degradado */
+[data-theme=modern] .hdr h1{font-size:clamp(1.9rem,3.6vw,2.7rem);font-weight:800;letter-spacing:-.03em;background:linear-gradient(90deg,#fff 10%,var(--sac) 60%,var(--ac2));-webkit-background-clip:text;background-clip:text;color:transparent}
+[data-theme=modern] .status{color:var(--mu)}
+/* Cristal en todas las tarjetas */
+[data-theme=modern] .box,[data-theme=modern] .kpi,[data-theme=modern] .ins,[data-theme=modern] .bgt,[data-theme=modern] .filters{border-radius:26px;border:1px solid var(--bd);box-shadow:var(--sh);-webkit-backdrop-filter:blur(18px);backdrop-filter:blur(18px)}
+[data-theme=modern] .box{padding:22px 24px}[data-theme=modern] .kpi{padding:20px 22px}[data-theme=modern] .bgt{padding:22px 26px}
+[data-theme=modern] .kpi::before{display:none}
+[data-theme=modern] .kpi b{font-size:clamp(1.4rem,2.1vw,1.85rem);white-space:nowrap;font-weight:800;letter-spacing:-.03em;background:linear-gradient(90deg,#fff,var(--sac));-webkit-background-clip:text;background-clip:text;color:transparent}
+[data-theme=modern] .kpi.ok b{background:linear-gradient(90deg,#fff,var(--ok));-webkit-background-clip:text;background-clip:text}
+[data-theme=modern] .kpi.warn b{background:linear-gradient(90deg,#fff,var(--warn));-webkit-background-clip:text;background-clip:text}
+[data-theme=modern] .kpi.bad b{background:linear-gradient(90deg,#fff,var(--bad));-webkit-background-clip:text;background-clip:text}
+[data-theme=modern] .kpi i b{background:none;-webkit-text-fill-color:var(--tx);color:var(--tx);font-size:inherit;font-weight:700}
+[data-theme=modern] .kpi:hover,[data-theme=modern] .ins:hover{transform:translateY(-4px);border-color:rgba(255,255,255,.28)}
+[data-theme=modern] h3{text-transform:none;letter-spacing:-.01em;font-size:1.02rem;font-weight:700;color:var(--tx)}
+[data-theme=modern] .sec{font-size:1.25rem;font-weight:800;letter-spacing:-.02em}[data-theme=modern] .sec::after{background:linear-gradient(90deg,var(--bd),transparent)}
+[data-theme=modern] .ins .dot{box-shadow:0 0 14px currentColor}
+/* Controles en forma de píldora */
+[data-theme=modern] select,[data-theme=modern] input{border-radius:16px;background:rgba(255,255,255,.07);border-color:var(--bd)}
+[data-theme=modern] select option{background:#14173a;color:#f4f6ff}
+[data-theme=modern] button{border-radius:16px;background:rgba(255,255,255,.07);border-color:var(--bd)}
+[data-theme=modern] .pri{background:linear-gradient(135deg,#8b6cff,#00b8e6);border:0;color:#fff;box-shadow:0 8px 24px rgba(139,108,255,.4)}
+[data-theme=modern] .seg{border-radius:16px;background:rgba(255,255,255,.06);padding:3px}
+[data-theme=modern] .seg button{border-radius:13px;background:none;border:0}
+[data-theme=modern] .seg button.on{background:linear-gradient(135deg,#8b6cff,#00b8e6);box-shadow:0 6px 18px rgba(139,108,255,.4)}
+[data-theme=modern] .sub button{border-radius:20px}
+[data-theme=modern] .bgt-bar{height:20px;border-radius:20px;background:rgba(255,255,255,.08)}[data-theme=modern] .bgt-bar i{border-radius:20px;box-shadow:0 0 18px rgba(139,108,255,.55);background:linear-gradient(90deg,#8b6cff,#00e5c8)}
+[data-theme=modern] .bgt-bar i.warn{background:linear-gradient(90deg,#ffc247,#ff7a45)}[data-theme=modern] .bgt-bar i.bad{background:linear-gradient(90deg,#ff5c7a,#ff2d55)}
+[data-theme=modern] .bgt-h b{font-size:2rem;font-weight:800;letter-spacing:-.03em}
+[data-theme=modern] th{background:rgba(255,255,255,.07);border-bottom:1px solid var(--bd)}
+[data-theme=modern] th,[data-theme=modern] td{border-bottom-color:rgba(255,255,255,.08)}
+[data-theme=modern] .scroll,[data-theme=modern] .cl2{border-radius:18px}
+[data-theme=modern] .calw i,[data-theme=modern] .hm div{border-radius:6px}
+[data-theme=modern] .mbox,[data-theme=modern] .dbox{background:rgba(20,22,52,.94);border-radius:30px;-webkit-backdrop-filter:blur(30px);backdrop-filter:blur(30px)}
+[data-theme=modern] .thc{border-radius:18px}
+[data-theme=modern] .ldbox{border-radius:32px}
+@media(max-width:1000px){[data-theme=modern] .side{inset:auto;position:sticky;top:8px;margin:8px;width:auto;border-radius:22px;padding:8px 10px}[data-theme=modern] .main{margin:0;padding:16px}}
