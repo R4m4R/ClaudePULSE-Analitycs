@@ -1,5 +1,4 @@
 /* Catálogo de temas. Claro y Oscuro viven en tema.css; aquí el resto. */
-:root[data-theme=corporate]{--bg:#f2f4f8;--card:#fff;--card2:#e9edf5;--bd:#dce2ee;--tx:#12233f;--mu:#586986;--ac:#0b5cab;--acrgb:11,92,171;--ok:#1b9e77;--warn:#e9a23b;--bad:#c8553d;--sh:0 1px 2px rgba(18,35,63,.06),0 10px 26px rgba(18,35,63,.08);--side:linear-gradient(185deg,#0b2545 0%,#13315c 100%);--glass:rgba(242,244,248,.88)}
 :root[data-theme=forest]{--bg:#f0f6f1;--card:#fff;--card2:#e5efe7;--bd:#d3e4d8;--tx:#12261b;--mu:#566f5f;--ac:#1f8a4c;--acrgb:31,138,76;--ok:#1f8a4c;--warn:#e9a23b;--bad:#c8553d;--sh:0 1px 2px rgba(18,38,27,.05),0 10px 26px rgba(18,38,27,.08);--side:linear-gradient(185deg,#0f2a1c 0%,#1b4332 100%);--glass:rgba(240,246,241,.88)}
 :root[data-theme=lavender]{--bg:#f6f3fb;--card:#fff;--card2:#ede8f8;--bd:#e0d8f1;--tx:#231a3d;--mu:#6a5e8f;--ac:#7c4dff;--acrgb:124,77,255;--ok:#12b886;--warn:#f59f00;--bad:#e03166;--sh:0 1px 2px rgba(35,26,61,.05),0 10px 26px rgba(70,40,150,.09);--side:linear-gradient(185deg,#241446 0%,#3b2370 100%);--glass:rgba(246,243,251,.88)}
 :root[data-theme=midnight]{color-scheme:dark;--bg:#050816;--card:#0d1330;--card2:#141c42;--bd:#1f2a5c;--tx:#e6eaff;--mu:#8794d1;--ac:#5b8cff;--acrgb:91,140,255;--ok:#34d399;--warn:#fbbf24;--bad:#f87171;--sh:0 1px 2px rgba(0,0,0,.4),0 12px 34px rgba(0,0,0,.45);--side:linear-gradient(185deg,#03050f 0%,#0a1030 100%);--glass:rgba(5,8,22,.86)}
@@ -27,7 +26,8 @@
 :root[data-theme=ocean]{--ac2:#2dd4bf;--sac:#5be3f5;--sacrgb:91,227,245}
 :root[data-theme=sunset]{--ac2:#f472b6;--sac:#ffa56f;--sacrgb:255,165,111}
 :root[data-theme=graphite]{--ac2:#f59e0b;--sac:#fcd34d;--sacrgb:252,211,77}
-:root[data-theme=corporate]{--ac2:#2a9d8f;--sac:#6cb0ff;--sacrgb:108,176,255}
 :root[data-theme=forest]{--ac2:#6aa84f;--sac:#6fd39a;--sacrgb:111,211,154}
 :root[data-theme=lavender]{--ac2:#ec4899;--sac:#b79cff;--sacrgb:183,156,255}
 :root[data-theme=contrast]{--ac2:#00e5ff;--sac:#ffe600;--sacrgb:255,230,0}
+
+:root[data-theme=contrast] .logo{color:#000}

@@ -18,5 +18,33 @@
 .dbox h4{font-size:.74rem;text-transform:uppercase;color:var(--mu);letter-spacing:.08em;margin:18px 0 8px}
 .dk{grid-template-columns:repeat(auto-fit,minmax(135px,1fr))!important;margin-bottom:0!important}
 .tg{display:inline-block;padding:1px 9px;border-radius:20px;background:rgba(var(--acrgb),.12);color:var(--ac);font-size:.72rem;margin:1px 2px;white-space:nowrap}
-.dbox td:nth-child(2){white-space:normal;text-align:left;max-width:300px}
+.dbox td:has(.tg){white-space:normal;text-align:left;max-width:300px}
 .errbar{position:fixed;top:0;left:0;right:0;background:#e03131;color:#fff;padding:9px 16px;z-index:200;display:none;font-size:.85rem}.errbar.on{display:block}
+
+/* Barra de presupuesto a todo el ancho */
+.bgt{background:var(--card);border:1px solid var(--bd);border-radius:var(--r);padding:16px 20px;box-shadow:var(--sh);margin-bottom:14px}
+.bgt-h{display:flex;justify-content:space-between;align-items:flex-start;gap:12px;margin-bottom:12px}
+.bgt-h small{color:var(--mu);text-transform:uppercase;letter-spacing:.08em;font-size:.68rem;font-weight:600}
+.bgt-h b{display:block;font-size:1.5rem;letter-spacing:-.02em;margin-top:2px}.bgt-h b span{font-size:.9rem;font-weight:500;color:var(--mu)}
+.msel{width:auto;min-width:160px;font-weight:600}
+.bgt-bar{position:relative;height:16px;border-radius:12px;background:var(--card2);overflow:visible}
+.bgt-bar i{display:block;height:100%;border-radius:12px;transition:width .6s ease;background:linear-gradient(90deg,var(--ok),var(--ac))}
+.bgt-bar i.warn{background:linear-gradient(90deg,#ffc53d,#ff922b)}.bgt-bar i.bad{background:linear-gradient(90deg,#ff6b6b,#e03131)}
+.bgt-bar u{position:absolute;top:-5px;bottom:-5px;width:3px;margin-left:-1px;background:var(--tx);border-radius:2px;opacity:.7;text-decoration:none}
+.bgt-f{display:flex;gap:6px 26px;flex-wrap:wrap;margin-top:12px;font-size:.82rem;color:var(--mu)}.bgt-f b{color:var(--tx)}.bgt-f .bad,.bgt-f b.bad{color:var(--bad)}
+/* Configuración: listas de proyectos y modelos */
+.mbox{width:min(580px,100%)}
+.mini{float:right;display:inline-flex;gap:4px}.mini button{padding:1px 9px;font-size:.68rem;border-radius:20px;text-transform:none;letter-spacing:0;font-weight:600}
+.cl2{max-height:170px;overflow:auto;border:1px solid var(--bd);border-radius:10px;padding:4px;background:var(--card2)}
+.cl2 label.ck2{display:flex;align-items:center;gap:9px;padding:5px 8px;border-radius:7px;font-size:.82rem;font-weight:500;color:var(--tx);text-transform:none;letter-spacing:0;cursor:pointer}
+.cl2 label.ck2:hover{background:rgba(var(--acrgb),.1)}.cl2 .ck2 input{width:auto;accent-color:var(--ac);margin:0}.cl2 .ck2 small{margin-left:auto;color:var(--mu);font-size:.74rem;font-weight:500}
+.kpi i b{color:var(--tx);font-weight:600}
+.kpi i b{display:inline!important;font-size:inherit!important;margin:0!important;letter-spacing:0!important;font-weight:600;background:none!important;-webkit-text-fill-color:var(--tx)!important;color:var(--tx)!important}
+
+/* Iconos del dashboard y de la pestaña */
+.logo svg{width:22px;height:22px}.logo.img{background:none!important;box-shadow:none!important;overflow:hidden}.logo img{width:100%;height:100%;object-fit:contain;border-radius:inherit}
+.icg{display:grid;grid-template-columns:repeat(8,1fr);gap:6px;margin-bottom:8px}
+.icb{padding:7px 0;display:grid;place-items:center;border-radius:10px;color:var(--tx);width:auto}.icb svg,.icb img{width:20px;height:20px}.icb img{object-fit:contain}
+.icb.on{border-color:var(--ac);color:var(--ac);box-shadow:0 0 0 2px rgba(var(--acrgb),.3)}
+.upb{width:100%;font-size:.8rem;border-style:dashed}
+.mini button.on{background:var(--ac);color:#fff;border-color:var(--ac)}
