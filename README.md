@@ -1,16 +1,42 @@
-# ClaudeScope
-Dashboard de status, metricas i graficas de tu aplicacion ClaudeCode (realizado para win)
-📊 Claude SCOPE Session Dashboard
+📊 ClawCost Analytics: Analiza costes, estadísticas de modelos y proyectos en Claude Code.
 
-Dashboard de monitorización con **auto-refresh ** diseñado para visualizar, analizar y auditar toda la actividad e historial de tus sesiones en **Claude Code**.
+Panel de monitorización con actualización automática (auto-refresh) diseñado para visualizar, analizar y auditar la actividad y el historial de tus sesiones en Claude Code.
 
-Transforma los logs y datos de uso de tu asistente de programación en métricas accionables y gráficas interactivas para mantener el control total sobre tu flujo de trabajo y consumo.
+Transforma los registros y datos de uso de tu asistente de programación en métricas claras y gráficos interactivos para mantener el control total de tu flujo de trabajo y consumo.
 
-## ✨ Características principales
+✨ Características Principales
+🔄 Actualización automática (Auto-refresh): Sincronización continua de la sesión activa sin necesidad de recargar manualmente.
 
-* 🔄 **Actualización automática (Auto-refresh):** Sincronización continua del estado de la sesión activa sin necesidad de recargar manualmente.
-* 🪙 **Analítica de Tokens y Costes:** Seguimiento detallado de tokens de entrada, salida y caché acumulados por sesión o de forma histórica.
-* 🤖 **Desglose por Modelos:** Comparativa de uso y rendimiento entre distintos modelos (Sonnet, Opus, Haiku, etc.).
-* 📁 **Métricas por Proyecto:** Agrupación de actividad, consumo y sesiones vinculadas a cada repositorio o directorio de trabajo.
-* ⏱️ **Tiempos y Rendimiento:** Registro de duración de sesiones, tiempos de respuesta y frecuencia de uso a lo largo del tiempo.
-* 📈 **Visualización Gráfica:** Gráficas interactivas de tendencias históricas, distribución de carga y actividad diaria.
+🪙 Análisis de tokens y costes: Seguimiento detallado de los tokens de entrada, salida y caché por sesión o de forma histórica.
+
+🤖 Desglose por modelos: Comparativa de uso y rendimiento entre diferentes modelos (Sonnet, Opus, Haiku, etc.).
+
+📁 Métricas por proyecto: Agrupación de la actividad, el consumo y las sesiones según cada repositorio o directorio de trabajo.
+
+⏱️ Tiempos y rendimiento: Registro de la duración de las sesiones, los tiempos de respuesta y la frecuencia de uso a lo largo del tiempo.
+
+📈 Visualización gráfica: Gráficos interactivos de tendencias históricas, distribución de carga y actividad diaria
+
+#ENGLISH
+
+CLAWCOST-ANALYTICS
+Status dashboard, metrics, and charts for your Claude Code application (optimized for Windows).
+
+📊 ClawCost Analytics: Analyze costs, model statistics, and projects in Claude Code.
+
+A monitoring dashboard featuring auto-refresh, designed to visualize, analyze, and audit the activity and history of your Claude Code sessions.
+
+Transform your coding assistant's logs and usage data into actionable metrics and interactive charts to maintain total control over your workflow and resource consumption.
+
+✨ Key Features
+🔄 Auto-refresh: Continuous synchronization of active session status without manual reloads.
+
+🪙 Token & Cost Analytics: Detailed tracking of input, output, and cache tokens accumulated per session or historically.
+
+🤖 Model Breakdown: Usage and performance comparison across different models (Sonnet, Opus, Haiku, etc.).
+
+📁 Project Metrics: Grouping of activity, consumption, and sessions linked to each repository or working directory.
+
+⏱️ Time & Performance: Tracking of session durations, response times, and usage frequency over time.
+
+📈 Graphical Visualization: Interactive charts showing historical trends, workload distribution, and daily activity.
