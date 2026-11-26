@@ -46,4 +46,13 @@ Transform your coding assistant's logs and usage data into actionable metrics an
 
 <img width="1886" height="921" alt="image" src="https://github.com/user-attachments/assets/e3ed7c47-6bfb-43b9-b18d-af1b89abd784" />
 
+<img width="1703" height="801" alt="image" src="https://github.com/user-attachments/assets/eb35819a-a0d8-45cf-960a-441f13eb6669" />
+
+<img width="1567" height="608" alt="image" src="https://github.com/user-attachments/assets/85f979d6-2a20-4dc0-bf2b-018ec0854c9c" />
+
+<img width="1562" height="629" alt="image" src="https://github.com/user-attachments/assets/53950284-ba6e-45e4-ae3d-dafe9f084412" />
+
+
+
+
 
