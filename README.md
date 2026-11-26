@@ -40,3 +40,10 @@ Transform your coding assistant's logs and usage data into actionable metrics an
 ⏱️ Time & Performance: Tracking of session durations, response times, and usage frequency over time.
 
 📈 Graphical Visualization: Interactive charts showing historical trends, workload distribution, and daily activity.
+
+
+
+
+<img width="1886" height="921" alt="image" src="https://github.com/user-attachments/assets/e3ed7c47-6bfb-43b9-b18d-af1b89abd784" />
+
+
