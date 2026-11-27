@@ -4,8 +4,10 @@ Version6 :
 - se han mejorado los costes y % de uso
 - Se han añadido los gastos por las propias herramientas de ClaudeCode: Skills, plugins, MCP ...
 
+--------------------------------------------------------------------------------------------------------------------
+<h2>📊ClawCost Analytics : Analiza costes, estadísticas de modelos y proyectos en Claude Code.</h2>
 
-<h1>📊ClawCost Analytics<h2> Analiza costes, estadísticas de modelos y proyectos en Claude Code.</h2></h1><ul>
+  *PARA WINDOWS*
 
 Panel de monitorización con actualización automática (auto-refresh) diseñado para visualizar, analizar y auditar la actividad y el historial de tus sesiones en Claude Code.
 
@@ -23,13 +25,15 @@ Transforma los registros y datos de uso de tu asistente de programación en mét
 ⏱️ Tiempos y rendimiento: Registro de la duración de las sesiones, los tiempos de respuesta y la frecuencia de uso a lo largo del tiempo.
 
 📈 Visualización gráfica: Gráficos interactivos de tendencias históricas, distribución de carga y actividad diaria
-
+--------------------------------------------------------------------------------------------------------------------
 #ENGLISH
 
 CLAWCOST-ANALYTICS
-Status dashboard, metrics, and charts for your Claude Code application (optimized for Windows).
+Status dashboard, metrics, and charts for your Claude Code application (optimized for Windows).<
 
-📊 ClawCost Analytics: Analyze costs, model statistics, and projects in Claude Code.
+<h2>📊 ClawCost Analytics: Analyze costs, model statistics, and projects in Claude Code./h2>
+
+  *FOR WINDOWS*
 
 A monitoring dashboard featuring auto-refresh, designed to visualize, analyze, and audit the activity and history of your Claude Code sessions.
 
