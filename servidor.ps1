@@ -19,9 +19,9 @@ using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
 
-public class Rec { public long H; public long T; public string P; public string M; public double I; public double O; public double CW; public double CR; }
+public class Rec { public long H; public long T; public string P; public string M; public double I; public double O; public double CW; public double CR; public string Cat; public string Sub; public double TM; }
 public class FC { public long Len; public long W; public Rec[] Recs; }
-public class Bk { public string D; public int Hr; public string P; public string M; public double I, O, CW, CR, C, KI, KO, KW, KR, S, G; public int N; }
+public class Bk { public string D; public int Hr; public string P; public string M; public string Cat; public string Sub; public double I, O, CW, CR, C, KI, KO, KW, KR, S, G, TM; public int N; }
 
 public static class Engine
 {
@@ -37,6 +37,12 @@ public static class Engine
     static readonly Regex RCw = new Regex("\"cache_creation_input_tokens\":(\\d+)", RegexOptions.Compiled);
     static readonly Regex RCr = new Regex("\"cache_read_input_tokens\":(\\d+)", RegexOptions.Compiled);
     static readonly Regex ROpusOld = new Regex("opus-(3|4(-1)?)(-\\d{8})?$", RegexOptions.Compiled);
+    static readonly Regex RSidechain = new Regex("\"isSidechain\":true", RegexOptions.Compiled);
+    static readonly Regex RThinkMs = new Regex("\"thinkingDurationMs\":(\\d+)", RegexOptions.Compiled);
+    static readonly Regex RAgentUse = new Regex("\"name\":\"Agent\",\"input\":\\{\"description\":\"[^\"]*\",\"subagent_type\":\"([^\"]+)\"", RegexOptions.Compiled);
+    static readonly Regex RSkillUse = new Regex("\"name\":\"Skill\",\"input\":\\{\"skill\":\"([^\"]+)\"", RegexOptions.Compiled);
+    static readonly Regex RMcpUse = new Regex("\"name\":\"(mcp__[A-Za-z0-9_]+)\"", RegexOptions.Compiled);
+    static readonly Regex RLoopUse = new Regex("\"name\":\"ScheduleWakeup\"", RegexOptions.Compiled);
 
     public static bool Running;
     public static bool Ready;
@@ -135,6 +141,23 @@ public static class Engine
                 Match mc = RCwd.Match(line);
                 r.P = string.Intern(Proj(mc.Success ? mc.Groups[1].Value : null, fb));
                 r.I = Num(RIn, tail); r.O = Num(ROut, tail); r.CW = Num(RCw, tail); r.CR = Num(RCr, tail);
+                r.TM = Num(RThinkMs, line);
+                string cat = "procesar", sub = "";
+                if (RSidechain.IsMatch(line)) { cat = "agentes"; sub = "subagente"; }
+                else {
+                    Match mAg = RAgentUse.Match(line);
+                    Match mSk = RSkillUse.Match(line);
+                    Match mMc = RMcpUse.Match(line);
+                    if (mAg.Success) { cat = "agentes"; sub = mAg.Groups[1].Value; }
+                    else if (mSk.Success) { cat = "skills"; sub = mSk.Groups[1].Value; }
+                    else if (mMc.Success) {
+                        cat = "mcp";
+                        string[] parts = mMc.Groups[1].Value.Split(new string[] { "__" }, StringSplitOptions.None);
+                        sub = parts.Length >= 2 ? parts[1] : mMc.Groups[1].Value;
+                    }
+                    else if (RLoopUse.IsMatch(line)) { cat = "loops"; sub = "loop"; }
+                }
+                r.Cat = cat; r.Sub = sub;
                 Match mi = RId.Match(line);
                 if (mi.Success)
                 {
@@ -235,12 +258,12 @@ public static class Engine
             lastG = x.T; lastP[x.P] = x.T;
             DateTime dt = new DateTime(x.T);
             string day = dt.ToString("yyyy-MM-dd", Inv);
-            string key = day + "|" + dt.Hour + "|" + x.P + "|" + x.M;
+            string key = day + "|" + dt.Hour + "|" + x.P + "|" + x.M + "|" + x.Cat + "|" + x.Sub;
             Bk k;
-            if (!b.TryGetValue(key, out k)) { k = new Bk(); k.D = day; k.Hr = dt.Hour; k.P = x.P; k.M = x.M; b[key] = k; }
+            if (!b.TryGetValue(key, out k)) { k = new Bk(); k.D = day; k.Hr = dt.Hour; k.P = x.P; k.M = x.M; k.Cat = x.Cat; k.Sub = x.Sub; b[key] = k; }
             k.I += x.I; k.O += x.O; k.CW += x.CW; k.CR += x.CR;
             k.KI += ki; k.KO += ko; k.KW += kw; k.KR += kr; k.C += ki + ko + kw + kr;
-            k.N++; k.S += s; k.G += g;
+            k.N++; k.S += s; k.G += g; k.TM += x.TM;
         }
         StringBuilder sb = new StringBuilder();
         sb.Append("{\"generado\":\"").Append(DateTime.Now.ToString("s", Inv)).Append("\",\"archivos\":").Append(nfiles).Append(",\"mensajes\":").Append(all.Count).Append(",\"rows\":[");
@@ -251,7 +274,8 @@ public static class Engine
             sb.Append("{\"d\":\"").Append(k.D).Append("\",\"h\":").Append(k.Hr).Append(",\"p\":\"").Append(Esc(k.P)).Append("\",\"m\":\"").Append(Esc(k.M)).Append("\"");
             sb.Append(",\"i\":").Append(N(k.I)).Append(",\"o\":").Append(N(k.O)).Append(",\"cw\":").Append(N(k.CW)).Append(",\"cr\":").Append(N(k.CR));
             sb.Append(",\"c\":").Append(N(k.C)).Append(",\"n\":").Append(k.N).Append(",\"s\":").Append(N(k.S)).Append(",\"g\":").Append(N(k.G));
-            sb.Append(",\"ki\":").Append(N(k.KI)).Append(",\"ko\":").Append(N(k.KO)).Append(",\"kw\":").Append(N(k.KW)).Append(",\"kr\":").Append(N(k.KR)).Append('}');
+            sb.Append(",\"ki\":").Append(N(k.KI)).Append(",\"ko\":").Append(N(k.KO)).Append(",\"kw\":").Append(N(k.KW)).Append(",\"kr\":").Append(N(k.KR));
+            sb.Append(",\"ct\":\"").Append(Esc(k.Cat)).Append("\",\"sb\":\"").Append(Esc(k.Sub)).Append("\",\"rz\":").Append(N(k.TM / 1000.0)).Append('}');
         }
         return sb.Append("]}").ToString();
     }
@@ -263,6 +287,25 @@ public static class Engine
 }
 '@
 Add-Type -TypeDefinition $src -Language CSharp
+
+# ---- PLAN (% de uso real reportado por Claude Code/Desktop) -------------
+function Get-PlanInfo {
+    $result = @{ pct = $null; fecha = $null }
+    $candidatos = Get-ChildItem "$env:LOCALAPPDATA\Claude-Data" -Filter "plan-usage-history.json" -Recurse -ErrorAction SilentlyContinue
+    $path = $candidatos | Sort-Object LastWriteTime -Descending | Select-Object -First 1 -ExpandProperty FullName
+    if ($path -and (Test-Path $path)) {
+        try {
+            $j = Get-Content $path -Raw | ConvertFrom-Json
+            $last = $j.samples | Where-Object { $_.u -and $_.u.PSObject.Properties.Count -gt 0 } | Sort-Object t | Select-Object -Last 1
+            if ($last) {
+                $result.pct = [math]::Round([double]$last.u.xu, 1)
+                $epoch = [datetime]"1970-01-01"
+                $result.fecha = $epoch.AddMilliseconds($last.t).ToString("yyyy-MM-dd HH:mm")
+            }
+        } catch {}
+    }
+    return $result
+}
 
 # ---- SERVIDOR -----------------------------------------------------------
 function Get-PuertoLibre($ini) {
@@ -299,6 +342,8 @@ try {
             } elseif ($ruta -eq '/api/refresh') {
                 [void][Engine]::Start([string[]]$Raices, [int]$IdleSeg)
                 $res.ContentType = 'application/json; charset=utf-8'; $buf = [Text.Encoding]::UTF8.GetBytes([Engine]::Estado())
+            } elseif ($ruta -eq '/api/plan') {
+                $res.ContentType = 'application/json; charset=utf-8'; $buf = [Text.Encoding]::UTF8.GetBytes((Get-PlanInfo | ConvertTo-Json))
             } elseif ($ruta -eq '/api/data') {
                 $res.ContentType = 'application/json; charset=utf-8'
                 $j = [Engine]::Json; if (-not $j) { $j = '{"listo":false,"rows":[]}' }

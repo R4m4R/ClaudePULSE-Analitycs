@@ -9,7 +9,9 @@ else Chart.defaults.font.family="Inter,'Segoe UI',system-ui,sans-serif";
 const LS={get(k){try{return localStorage.getItem(k)}catch(e){return null}},set(k,v){try{localStorage.setItem(k,v)}catch(e){}}};
 const COL=['#4f6bed','#14b8a6','#f59e0b','#ef4468','#38bdf8','#a78bfa','#84cc16','#fb923c','#22d3ee','#e879f9','#eab308','#94a3b8'];
 const BASE=['#84cc16','#fb923c','#22d3ee','#e879f9','#eab308','#94a3b8'];
-let prevBrand='[]',RAW0=[],RAW=[],GR='auto',charts={},colors={},timer,TAB='general',CUR={rows:[]},prevTheme='auto',ldT;
+let prevBrand='[]',RAW0=[],RAW=[],GR='auto',charts={},colors={},timer,TAB='general',CUR={rows:[]},prevTheme='auto',ldT,PLAN={pct:null,fecha:null};
+const CATN={procesar:'Procesamiento general',agentes:'Agentes (sub-tareas)',skills:'Skills',mcp:'Herramientas MCP',loops:'Loops / auto-tareas'};
+const catn=c=>CATN[c]||c;
 const F={m:'',d:'',h0:0,h1:23,mo:'',p:''};
 const CFG=Object.assign({lim:180,cur:'EUR',fx:0.92,theme:'auto',rf:5,exP:[],exM:[],logo:{t:'p',v:'diamond'},fav:{t:'same'}},(()=>{try{return JSON.parse(LS.get('cfg')||'{}')}catch(e){return{}}})());
 const SYM=()=>CFG.cur==='EUR'?'€':'$';
@@ -120,6 +122,7 @@ async function load(silent){if(busy)return;busy=true;if(!silent){showLoader();se
     $('ldm').textContent=e.cargando?((e.fase||'Leyendo')+(e.total?` · ${e.hechos} de ${e.total} archivos · ${num(e.mensajes)} mensajes`:'')):'Preparando gráficos…'}
    if(e.listo&&!e.cargando)break;await sleep(e.cargando?350:150)}
   const r=await fetch('/api/data');if(!r.ok)throw new Error('HTTP '+r.status);const d=await r.json();RAW0=d.rows||[];applyFx();buildColors();
+  try{const rp=await fetch('/api/plan');if(rp.ok)PLAN=await rp.json()}catch(e){}
   $('st').textContent=RAW0.length?`${d.archivos} archivos · ${num(d.mensajes)} mensajes · actualizado ${new Date().toLocaleTimeString()} · auto-refresco: ${rfTxt(CFG.rf)}`:'No se han encontrado datos de uso. Revisa la consola del servidor.';
   buildFilters();render();hideLoader()}catch(e){$('st').textContent='Error: '+e;if(!silent)loaderError(e)}finally{busy=false}}
 
@@ -147,12 +150,15 @@ const tags=(set,f)=>[...set].slice(0,8).map(x=>`<span class="tg">${f?f(x):x}</sp
 function openDetail(title,rows){
  if(!rows||!rows.length)return;
  const c=sum(rows,r=>r.c),t=sum(rows,tok),n=sum(rows,r=>r.n),days=new Set(rows.map(r=>r.d)),ds=[...days].sort(),
- P=grp(rows,r=>r.p),M=grp(rows,r=>r.m),D=grp(rows,r=>r.d).slice(0,8),
+ P=grp(rows,r=>r.p),M=grp(rows,r=>r.m),D=grp(rows,r=>r.d).slice(0,8),C=grp(rows,r=>r.ct),
+ H=grp(rows.filter(r=>r.ct!=='procesar'||r.sb),r=>r.ct+'|'+r.sb).sort((a,b)=>b.c-a.c).slice(0,10),
  K=(a,b,s)=>`<div class="kpi"><small>${a}</small><b>${b}</b><i>${s||''}</i></div>`;
  $('dtb').innerHTML=`<div class="dh"><div><small>Detalle</small><h2>${title}</h2></div><button class="ic" onclick="closeDt()" title="Cerrar (Esc)">✕</button></div>
  <div class="kpis dk">${K('Gasto',usd(c))}${K('Tokens',num(t),'↓'+num(sum(rows,r=>r.i))+' ↑'+num(sum(rows,r=>r.o))+' · caché '+num(sum(rows,r=>r.cw+r.cr)))}${K('Tiempo de uso',hrs(tm(rows)))}${K('Mensajes',num(n))}${K('Días',days.size,ds[0]+(ds.length>1?' → '+ds[ds.length-1]:''))}</div>
  <h4>Proyectos (${P.length})</h4><div class="scroll"><table><tr><th>Proyecto</th><th>Modelos usados</th><th>Tiempo</th><th>Tokens</th><th>Gasto</th></tr>${P.map(a=>`<tr><td>${a.k}</td><td>${tags(a.m,mn)}</td><td>${hrs(a.s)}</td><td>${num(a.t)}</td><td>${usd(a.c)}</td></tr>`).join('')}</table></div>
  <h4>Modelos (${M.length})</h4><div class="scroll"><table><tr><th>Modelo</th><th>Proyectos</th><th>Tiempo</th><th>Tokens</th><th>Gasto</th></tr>${M.map(a=>`<tr><td>${mn(a.k)}</td><td>${tags(a.p)}</td><td>${hrs(a.g)}</td><td>${num(a.t)}</td><td>${usd(a.c)}</td></tr>`).join('')}</table></div>
+ ${C.length>1?`<h4>En qué se ha consumido</h4><div class="scroll"><table><tr><th>Categoría</th><th>Tiempo</th><th>Tokens</th><th>Gasto</th></tr>${C.map(a=>`<tr><td>${catn(a.k)}</td><td>${hrs(a.s)}</td><td>${num(a.t)}</td><td>${usd(a.c)}</td></tr>`).join('')}</table></div>`:''}
+ ${H.length?`<h4>Skills, MCP, agentes y loops usados</h4><div class="scroll"><table><tr><th>Categoría</th><th>Nombre</th><th>Usos</th><th>Gasto</th></tr>${H.map(a=>{const[ct,sb]=a.k.split('|');return `<tr><td>${catn(ct)}</td><td>${sb||'<i>general</i>'}</td><td>${a.n}</td><td>${usd(a.c)}</td></tr>`}).join('')}</table></div>`:''}
  ${D.length>1?`<h4>Días con más gasto</h4><div class="scroll"><table><tr><th>Fecha</th><th>Tiempo</th><th>Tokens</th><th>Gasto</th></tr>${D.map(a=>`<tr><td>${a.k} ${DOW[wd(a.k)]}</td><td>${hrs(tm(rows.filter(r=>r.d===a.k)))}</td><td>${num(a.t)}</td><td>${usd(a.c)}</td></tr>`).join('')}</table></div>`:''}`;
  $('dt').classList.add('on')}
 function closeDt(){$('dt').classList.remove('on')}
@@ -222,11 +228,12 @@ let BM='',GM='';
 const mes=()=>mesDe(BM||curYm());
 const monthList=()=>[...new Set([...RAW.map(r=>r.d.slice(0,7)),curYm()])].sort();
 function initMonths(){const L=monthList(),dm=[...new Set(RAW.map(r=>r.d.slice(0,7)))].sort(),cur=curYm(),d=dm.includes(cur)?cur:(dm[dm.length-1]||cur);if(!BM||!L.includes(BM))BM=d;if(!GM||!L.includes(GM))GM=d}
-function budget(){const m=mesDe(curYm()),cl=m.pct>90?'bad':m.pct>70?'warn':'';$('bud').innerHTML=`Presupuesto del mes<b>${usd(m.tot)} / ${usd(CFG.lim)}</b><div class="bar"><i class="${cl}" style="width:${Math.min(m.pct,100)}%"></i></div><div style="margin-top:6px">${m.pct.toFixed(0)}% usado · quedan ${usd(m.rest)}</div>`}
-function budgetBar(){const m=mes(),cl=m.pct>90?'bad':m.pct>70?'warn':'ok',over=m.cur&&CFG.lim>0&&m.proy>CFG.lim,L=monthList().reverse();
- $('bgt').innerHTML=`<div class="bgt-h"><div><small>Presupuesto del mes</small><b>${usd(m.tot)} <span>de ${usd(CFG.lim)}</span></b></div><select class="msel" onchange="setBM(this.value)" title="Elegir mes">${L.map(x=>`<option value="${x}" ${x===m.ym?'selected':''}>${monthName(x)}</option>`).join('')}</select></div>
- <div class="bgt-bar"><i class="${cl}" style="width:${Math.min(m.pct,100)}%"></i>${m.cur&&CFG.lim?`<u style="left:${Math.min(100*m.proy/CFG.lim,100)}%" title="Proyección a fin de mes"></u>`:''}</div>
- <div class="bgt-f"><span><b>${m.pct.toFixed(0)}%</b> usado</span><span>Quedan <b>${usd(m.rest)}</b></span>${m.cur?`<span>Proyección fin de mes <b class="${over?'bad':''}">${usd(m.proy)}</b></span><span>Ritmo <b>${usd(m.rate)}</b> / día</span>`:`<span>Media diaria <b>${usd(m.tot/m.dim)}</b></span>`}${m.pct>100?`<span class="bad">Superado en <b>${usd(m.tot-CFG.lim)}</b></span>`:''}</div>`}
+function budget(){const m=mesDe(curYm()),real=PLAN.pct!=null,pct=real?PLAN.pct:m.pct,cl=pct>90?'bad':pct>70?'warn':'';
+ $('bud').innerHTML=`${real?'Uso del plan (Claude Code)':'Presupuesto del mes'}<b>${pct.toFixed(0)}%</b><div class="bar"><i class="${cl}" style="width:${Math.min(pct,100)}%"></i></div><div style="margin-top:6px">Gasto estimado: <b>${usd(m.tot)}</b> / ${usd(CFG.lim)}</div>`}
+function budgetBar(){const m=mes(),real=PLAN.pct!=null,pct=real?PLAN.pct:m.pct,cl=pct>90?'bad':pct>70?'warn':'ok',over=m.cur&&CFG.lim>0&&m.proy>CFG.lim,L=monthList().reverse();
+ $('bgt').innerHTML=`<div class="bgt-h"><div><small>${real?'Uso del plan (Claude Code)':'Presupuesto del mes'}</small><b>${pct.toFixed(0)}% <span>${real?'de uso del periodo'+(PLAN.fecha?' · act. '+PLAN.fecha:''):'de '+usd(CFG.lim)}</span></b></div><select class="msel" onchange="setBM(this.value)" title="Elegir mes">${L.map(x=>`<option value="${x}" ${x===m.ym?'selected':''}>${monthName(x)}</option>`).join('')}</select></div>
+ <div class="bgt-bar"><i class="${cl}" style="width:${Math.min(pct,100)}%"></i>${m.cur&&CFG.lim?`<u style="left:${Math.min(100*m.proy/CFG.lim,100)}%" title="Proyección a fin de mes"></u>`:''}</div>
+ <div class="bgt-f"><span>Presupuesto estimado: <b>${usd(m.tot)}</b> de ${usd(CFG.lim)}</span><span>Quedan <b>${usd(m.rest)}</b></span>${m.cur?`<span>Proyección fin de mes <b class="${over?'bad':''}">${usd(m.proy)}</b></span><span>Ritmo <b>${usd(m.rate)}</b> / día</span>`:`<span>Media diaria <b>${usd(m.tot/m.dim)}</b></span>`}${m.pct>100?`<span class="bad">Superado en <b>${usd(m.tot-CFG.lim)}</b></span>`:''}</div>`}
 function setBM(v){BM=v;budgetBar();if(TAB==='consumo')DRAW.consumo(CUR.rows)}
 function setGM(v){GM=v;drawOne('gMes')}
 function setGr(id,v){CH[id].gr=v;drawOne(id)}
@@ -242,16 +249,20 @@ def({id:'dM',title:'Reparto por modelo',modes:['donut','bar','col'],metrics:MALL
 def({id:'dP',title:'Reparto por proyecto',modes:['donut','bar','col'],metrics:MALL,build:(rows,mode,k)=>distSpec(rows,mode,k,r=>r.p,null,true)});
 def({id:'gTok',title:'Tokens por tipo en el tiempo',modes:['stack','side','line','sep'],build:(rows,mode)=>tsSpec(rows,mode,MET.t,tokD(),{skip:'t'})});
 def({id:'gHd',title:'Tiempo de uso en el periodo',modes:['col','line'],build:(rows,mode)=>simpleSpec(rows,mode,{label:'Tiempo',fy:rs=>(F.p?sum(rs,r=>r.s):sum(rs,r=>r.g))/3600,f:v=>hrs(v*3600),y:v=>v+' h',color:COL[1],skip:'s'})});
+def({id:'dCat',title:'En qué se ha consumido (categoría)',modes:['donut','bar','col'],metrics:MALL,build:(rows,mode,k)=>distSpec(rows,mode,k,r=>r.ct,catn,false)});
+def({id:'gCat',title:'Evolución por categoría de consumo',w2:1,modes:['sep','stack','side','line'],metrics:MALL,m0:'t',build:tsBy(r=>r.ct,false,catn)});
 // Modelos
 def({id:'mSum',title:'Resumen por modelo',w2:1,modes:['donut','bar','col'],metrics:MALL,build:(rows,mode,k)=>distSpec(rows,mode,k,r=>r.m,mn,false)});
 def({id:'mTs',title:'Evolución por modelo',w2:1,modes:['stack','side','line','sep'],metrics:MALL,m0:'c',build:tsBy(r=>r.m,false,mn)});
 def({id:'mCross',title:'Proyectos en los que se usa cada modelo',modes:['stack','side','sep'],metrics:MALL,build:(rows,mode,k)=>{const M=MM(k,false);return tsSpec(rows,mode,M,descSplit(rows,r=>r.p,M),{xk:r=>r.m,sortX:1,xlab:mn,skip:k})}});
 def({id:'mTok',title:'Tokens por tipo y modelo',modes:['stack','side','sep'],build:(rows,mode)=>tsSpec(rows,mode,MET.t,tokD(),{xk:r=>r.m,sortX:1,xlab:mn,skip:'t'})});
+def({id:'mCat',title:'En qué se ha consumido cada modelo',modes:['stack','side','sep'],metrics:MALL,build:(rows,mode,k)=>{const M=MM(k,false);return tsSpec(rows,mode,M,descSplit(rows,r=>r.ct,M,catn),{xk:r=>r.m,sortX:1,xlab:mn,skip:k})}});
 // Proyectos
 def({id:'pSum',title:'Resumen por proyecto',w2:1,modes:['donut','bar','col'],metrics:MALL,build:(rows,mode,k)=>distSpec(rows,mode,k,r=>r.p,null,true)});
 def({id:'pTs',title:'Evolución por proyecto',w2:1,modes:['stack','side','line','sep'],metrics:MALL,build:tsBy(r=>r.p,true)});
 def({id:'pCross',title:'Modelos usados en cada proyecto',modes:['stack','side','sep'],metrics:MALL,build:(rows,mode,k)=>{const M=MM(k,true);return tsSpec(rows,mode,M,descSplit(rows,r=>r.m,M,mn),{xk:r=>r.p,sortX:1,skip:k})}});
 def({id:'pTok',title:'Tokens por tipo y proyecto',modes:['stack','side','sep'],build:(rows,mode)=>tsSpec(rows,mode,MET.t,tokD(),{xk:r=>r.p,sortX:1,skip:'t'})});
+def({id:'pCat',title:'En qué se ha consumido cada proyecto',modes:['stack','side','sep'],metrics:MALL,build:(rows,mode,k)=>{const M=MM(k,true);return tsSpec(rows,mode,M,descSplit(rows,r=>r.ct,M,catn),{xk:r=>r.p,sortX:1,skip:k})}});
 // Consumo
 def({id:'cGauge',title:'Presupuesto del mes',modes:['gauge','bar'],src:()=>RAW,build:(rows,mode)=>{const m=mes(),c=m.pct>90?'#e03131':m.pct>70?'#f59f00':COL[0],pick=()=>({title:'Mes '+m.ym,rows:m.rs});
  if(mode==='bar')return{type:'bar',data:{labels:['Consumido','Proyección','Presupuesto'],datasets:[{data:[m.tot,m.proy,CFG.lim].map(v=>+v.toFixed(2)),backgroundColor:[c,al(COL[2],.8),'rgba(148,163,184,.5)'],borderRadius:6}]},options:{plugins:{legend:{display:false},tooltip:{callbacks:{label:x=>usd(x.parsed.y)}}},scales:{y:{beginAtZero:true,ticks:{callback:v=>v+' '+SYM()}}}},pick};
@@ -298,7 +309,7 @@ function kpis(rows){const t=grp(rows,()=>1)[0]||{c:0,t:0,i:0,o:0,cw:0,cr:0,n:0,d
  pl=(p,f,l)=>p?`<br>${l}: <b>${fdia(p.d)}</b> (${f(p.v)})`:'',W=grp(rows,r=>wd(r.d)).sort((a,b)=>dvv(b)-dvv(a))[0];
  $('kg').innerHTML=K('Gasto estimado',usd(t.c),(dias?usd(t.c/dias)+' / día activo':'')+pl(pk(a=>a.c),usd,'Más gasto'))+K('Tokens totales',num(t.t),`↓${num(t.i)} ↑${num(t.o)} · caché ${cache}%`+pl(pk(a=>a.t),num,'Más tokens'))+
  K('Horas de uso',hrs(secs),(F.p?'tiempo del proyecto':'tiempo activo real')+pl(pk(dvv),v=>hrs(v),'Día de más uso'))+K('Días activos',dias,(md?`de ${md} días del mes`:'en el filtro')+(W?`<br>Semana: <b>${DOWL[W.k]}</b> más activo`:''))+
- K('Mensajes',num(t.n),(t.n&&dias?Math.round(t.n/dias)+' / día':'')+pl(pk(a=>a.n),num,'Más mensajes'))+K('Proyectos',np,'activos')+K('Modelos',nm,'usados')+K('Coste / hora',secs>60?usd(t.c/(secs/3600)):'-','medio')}
+ K('Mensajes',num(t.n),(t.n&&dias?Math.round(t.n/dias)+' / día':'')+pl(pk(a=>a.n),num,'Más mensajes'))+K('Proyectos',np,'activos')+K('Modelos',nm,'usados')+K('Coste / hora',secs>60?usd(t.c/(secs/3600)):'-','medio')+K('Tiempo razonando',hrs(sum(rows,r=>r.rz||0)),'thinking / extended reasoning')}
 function insights(rows){const el=$('ins');if(!rows.length){el.innerHTML='';return}
  const t=grp(rows,()=>1)[0],b=m=>grp(rows,m)[0],pc=(a,c)=>c?Math.round(100*a/c)+'% del gasto':'',
  H=grp(rows,r=>r.h).sort((x,y)=>y.c-x.c)[0],W=grp(rows,r=>wd(r.d))[0],D=b(r=>r.d),P=b(r=>r.p),M=b(r=>r.m),
@@ -335,18 +346,25 @@ function entity(rows,keyFn,by,sec,host){destroyPref('ec_'+sec);const G=grp(rows,
 /* ===== Paneles ===== */
 const B=ids=>ids.map(boxHtml).join(''),SEC=t=>`<h2 class="sec">${t}</h2>`;
 const PANES={
- general:()=>`<div class="kpis" id="kg"></div><div class="grid">${B(['gMes'])}</div><div class="ins-grid" id="ins"></div><div class="grid">${B(['wk','gM','gP','dM','dP','gTok','gHd'])}<div class="box w2"><h3>Matriz Modelo × Proyecto (clic en una celda)</h3><div class="scroll" id="mx"></div></div></div>`,
- modelos:()=>SEC('Resumen')+`<div class="grid">${B(['mSum'])}</div>`+SEC('Detalle')+`<div class="grid">${B(['mTs','mCross','mTok'])}</div>`+SEC('Ficha de cada modelo')+`<div class="grid" id="cm"></div>`,
- proyectos:()=>SEC('Resumen')+`<div class="grid">${B(['pSum'])}<div class="box w2"><h3>Todos los proyectos (clic = filtrar)</h3><div class="scroll" id="tp"></div></div></div>`+SEC('Detalle')+`<div class="grid">${B(['pTs','pCross','pTok'])}</div>`+SEC('Ficha de cada proyecto')+`<div class="grid" id="cp"></div>`,
+ general:()=>`<div class="kpis" id="kg"></div><div class="grid">${B(['gMes'])}</div><div class="ins-grid" id="ins"></div><div class="grid">${B(['wk','gM','gP','dM','dP','dCat','gTok','gHd'])}<div class="box w2"><h3>Matriz Modelo × Proyecto (clic en una celda)</h3><div class="scroll" id="mx"></div></div></div>`,
+ modelos:()=>SEC('Resumen')+`<div class="grid">${B(['mSum'])}</div>`+SEC('Detalle')+`<div class="grid">${B(['mTs','mCross','mCat','mTok'])}</div>`+SEC('Ficha de cada modelo')+`<div class="grid" id="cm"></div>`,
+ proyectos:()=>SEC('Resumen')+`<div class="grid">${B(['pSum'])}<div class="box w2"><h3>Todos los proyectos (clic = filtrar)</h3><div class="scroll" id="tp"></div></div></div>`+SEC('Detalle')+`<div class="grid">${B(['pTs','pCross','pCat','pTok'])}</div>`+SEC('Ficha de cada proyecto')+`<div class="grid" id="cp"></div>`,
+ herramientas:()=>`<div class="kpis" id="kh"></div>`+SEC('Resumen por categoría')+`<div class="grid">${B(['dCat','gCat'])}</div>`+SEC('Detalle por skill, MCP, agente y loop')+`<div class="box w2"><h3>Desglose detallado (clic en una fila para ver el detalle)</h3><div class="scroll" id="htDet"></div></div>`,
  consumo:()=>`<div class="kpis" id="kc"></div>`+SEC('Resumen')+`<div class="grid">${B(['cGauge','cProj'])}</div>`+SEC('Detalle')+`<div class="grid">${B(['cEvo','cAcum','cDaily','cModel'])}</div>`,
  eficiencia:()=>`<div class="kpis" id="ke"></div>`+SEC('Resumen')+`<div class="grid">${B(['eTipo'])}</div>`+SEC('Detalle')+`<div class="grid">${B(['eCache','eCpm','eMod','ePar','eTop'])}</div>`,
  tiempo:()=>SEC('Resumen')+`<div class="grid">${B(['tHour'])}</div>`+SEC('Detalle')+`<div class="grid">${B(['tWeek','tMonth','tAct'])}<div class="box w2"><h3>Calendario de actividad · gasto por día</h3><div class="scroll" id="cal"></div></div><div class="box w2"><h3>Matriz día de la semana × hora (USD)</h3><div class="scroll" id="hw"></div></div><div class="box w2"><h3>Matriz día × hora (USD)</h3><div class="scroll" id="hd"></div></div><div class="box w2"><h3>Detalle por día</h3><div class="scroll" id="td"></div></div></div>`,
  matrices:()=>SEC('Resumen')+`<div class="grid">${B(['xSum'])}</div>`+SEC('Matrices (clic en una celda)')+`<div class="grid">${[['m1','Tiempo × Modelo · Gasto'],['m2','Proyecto × Modelo · Horas de uso'],['m3','Tiempo × Proyecto · Tokens'],['m4','Tiempo × Modelo · Tokens']].map(x=>`<div class="box w2"><h3>${x[1]}</h3><div class="scroll" id="${x[0]}"></div></div>`).join('')}</div>`};
+function herramientas(rows){const G=grp(rows,r=>r.ct+'|'+r.sb).filter(a=>{const[ct,sb]=a.k.split('|');return ct!=='procesar'||sb});
+ const top=G.length?G.slice().sort((a,b)=>b.n-a.n)[0]:null,topN=top?top.k.split('|'):null;
+ $('kh').innerHTML=(top?K('Herramienta más usada',topN[1]||catn(topN[0]),catn(topN[0])+' · '+top.n+' usos · '+usd(top.c)):K('Herramienta más usada','—','sin datos'))+K('Skills usadas',new Set(rows.filter(r=>r.ct==='skills').map(r=>r.sb)).size,'skills distintas')+K('Servidores MCP',new Set(rows.filter(r=>r.ct==='mcp').map(r=>r.sb)).size,'herramientas MCP usadas')+K('Agentes lanzados',new Set(rows.filter(r=>r.ct==='agentes').map(r=>r.sb)).size,'tipos de subagente')+K('Gasto en herramientas',usd(sum(G,a=>a.c)),'skills + MCP + agentes + loops')+K('Tiempo de razonamiento',hrs(sum(rows,r=>r.rz||0)),'thinking / extended reasoning');
+ $('htDet').innerHTML=G.length?'<table><tr><th>Categoría</th><th>Nombre</th><th>Usos</th><th>Tiempo</th><th>Tokens</th><th>Gasto</th></tr>'+G.sort((a,b)=>b.c-a.c).map(a=>{const[ct,sb]=a.k.split('|');return `<tr class="cl" data-ct="${esc(ct)}" data-sb="${esc(sb)}"><td>${catn(ct)}</td><td>${sb?esc(sb):'<i>general</i>'}</td><td>${a.n}</td><td>${hrs(a.s)}</td><td>${num(a.t)}</td><td>${usd(a.c)}</td></tr>`}).join('')+'</table>':'<div class="empty">Sin datos de skills, MCP, agentes o loops en el periodo filtrado</div>';
+ document.querySelectorAll('#htDet tr.cl').forEach(tr=>tr.onclick=()=>openDetail(catn(tr.dataset.ct)+(tr.dataset.sb?' · '+tr.dataset.sb:''),rows.filter(r=>r.ct===tr.dataset.ct&&r.sb===tr.dataset.sb)))}
 const DRAW={
- general:rows=>{['gMes','wk','gM','gP','dM','dP','gTok','gHd'].forEach(drawOne);const M=grp(rows,r=>r.m).map(a=>[a.k,mn(a.k)]),P=grp(rows,r=>r.p).map(a=>[a.k,a.k]);mtx('mx',P,M,(r,p,m)=>r.p===p&&r.m===m,r=>r.c,usd)},
- modelos:rows=>{['mSum','mTs','mCross','mTok'].forEach(drawOne);entity(rows,r=>r.m,'p','m','cm')},
- proyectos:rows=>{['pSum','pTs','pCross','pTok'].forEach(drawOne);const m=grp(rows,r=>r.p);$('tp').innerHTML=m.length?'<table><tr><th>Proyecto</th><th>Gasto</th><th>Tokens</th><th>Tiempo</th><th>Días</th><th>Msgs</th><th>Modelo principal</th></tr>'+m.map(a=>`<tr class="cl" data-proj="${a.k}"><td>${a.k}</td><td>${usd(a.c)}</td><td>${num(a.t)}</td><td>${hrs(a.s)}</td><td>${a.d.size}</td><td>${a.n}</td><td>${mn(grp(rows.filter(r=>r.p===a.k),r=>r.m)[0].k)}</td></tr>`).join('')+'</table>':'<div class="empty">Sin datos</div>';
+ general:rows=>{['gMes','wk','gM','gP','dM','dP','dCat','gTok','gHd'].forEach(drawOne);const M=grp(rows,r=>r.m).map(a=>[a.k,mn(a.k)]),P=grp(rows,r=>r.p).map(a=>[a.k,a.k]);mtx('mx',P,M,(r,p,m)=>r.p===p&&r.m===m,r=>r.c,usd)},
+ modelos:rows=>{['mSum','mTs','mCross','mCat','mTok'].forEach(drawOne);entity(rows,r=>r.m,'p','m','cm')},
+ proyectos:rows=>{['pSum','pTs','pCross','pCat','pTok'].forEach(drawOne);const m=grp(rows,r=>r.p);$('tp').innerHTML=m.length?'<table><tr><th>Proyecto</th><th>Gasto</th><th>Tokens</th><th>Tiempo</th><th>Días</th><th>Msgs</th><th>Modelo principal</th></tr>'+m.map(a=>`<tr class="cl" data-proj="${a.k}"><td>${a.k}</td><td>${usd(a.c)}</td><td>${num(a.t)}</td><td>${hrs(a.s)}</td><td>${a.d.size}</td><td>${a.n}</td><td>${mn(grp(rows.filter(r=>r.p===a.k),r=>r.m)[0].k)}</td></tr>`).join('')+'</table>':'<div class="empty">Sin datos</div>';
   document.querySelectorAll('#tp tr.cl').forEach(tr=>tr.onclick=()=>{F.p=tr.dataset.proj;buildFilters();render()});entity(rows,r=>r.p,'m','p','cp')},
+ herramientas:rows=>{['dCat','gCat'].forEach(drawOne);herramientas(rows)},
  consumo:()=>{consumoKpis();['cGauge','cProj','cEvo','cAcum','cDaily','cModel'].forEach(drawOne)},
  eficiencia:rows=>{eficienciaKpis(rows);['eTipo','eCache','eCpm','eMod','ePar','eTop'].forEach(drawOne)},
  tiempo:rows=>{['tHour','tWeek','tMonth','tAct'].forEach(drawOne);calendar(rows);
@@ -360,9 +378,9 @@ const DRAW={
 function render(){const rows=filtered();CUR={rows};kpis(rows);insights(rows);budget();budgetBar();DRAW[TAB](rows)}
 
 /* ===== Navegación e inicio ===== */
-const IC={general:'<path d="M3 3v18h18"/><path d="M7 15l4-5 3 3 5-7"/>',modelos:'<rect x="5" y="7" width="14" height="11" rx="2"/><path d="M12 7V4M9 12h.01M15 12h.01"/>',proyectos:'<path d="M3 7a2 2 0 0 1 2-2h4l2 2h8a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/>',consumo:'<circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/>',eficiencia:'<path d="M13 2L4 14h7l-1 8 9-12h-7z"/>',tiempo:'<rect x="3" y="5" width="18" height="16" rx="2"/><path d="M8 3v4M16 3v4M3 11h18"/>',matrices:'<rect x="4" y="4" width="6" height="6"/><rect x="14" y="4" width="6" height="6"/><rect x="4" y="14" width="6" height="6"/><rect x="14" y="14" width="6" height="6"/>'};
-const TITLES={general:'Visión general',modelos:'Análisis por modelo',proyectos:'Análisis por proyecto',consumo:'Consumo y presupuesto',eficiencia:'Eficiencia y ahorro',tiempo:'Análisis por tiempo',matrices:'Matrices cruzadas'};
+const IC={general:'<path d="M3 3v18h18"/><path d="M7 15l4-5 3 3 5-7"/>',modelos:'<rect x="5" y="7" width="14" height="11" rx="2"/><path d="M12 7V4M9 12h.01M15 12h.01"/>',proyectos:'<path d="M3 7a2 2 0 0 1 2-2h4l2 2h8a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/>',consumo:'<circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/>',eficiencia:'<path d="M13 2L4 14h7l-1 8 9-12h-7z"/>',tiempo:'<rect x="3" y="5" width="18" height="16" rx="2"/><path d="M8 3v4M16 3v4M3 11h18"/>',matrices:'<rect x="4" y="4" width="6" height="6"/><rect x="14" y="4" width="6" height="6"/><rect x="4" y="14" width="6" height="6"/><rect x="14" y="14" width="6" height="6"/>',herramientas:'<path d="M14.7 6.3a4 4 0 0 1-5.4 5.4L3 18l3 3 6.3-6.3a4 4 0 0 1 5.4-5.4l-2.6 2.6-2-2z"/>'};
+const TITLES={general:'Visión general',modelos:'Análisis por modelo',proyectos:'Análisis por proyecto',consumo:'Consumo y presupuesto',eficiencia:'Eficiencia y ahorro',tiempo:'Análisis por tiempo',matrices:'Matrices cruzadas',herramientas:'Skills, MCP, agentes y loops'};
 Object.keys(PANES).forEach(k=>{$('p-'+k).innerHTML=PANES[k]()});
-[['general','General'],['modelos','Por modelo'],['proyectos','Por proyecto'],['consumo','Consumo'],['eficiencia','Eficiencia'],['tiempo','Por tiempo'],['matrices','Matrices']].forEach(([k,l])=>{const b=document.createElement('button');b.innerHTML=`<svg viewBox="0 0 24 24">${IC[k]}</svg><span>${l}</span>`;b.className=k==TAB?'on':'';
+[['general','General'],['modelos','Por modelo'],['proyectos','Por proyecto'],['herramientas','Herramientas'],['consumo','Consumo'],['eficiencia','Eficiencia'],['tiempo','Por tiempo'],['matrices','Matrices']].forEach(([k,l])=>{const b=document.createElement('button');b.innerHTML=`<svg viewBox="0 0 24 24">${IC[k]}</svg><span>${l}</span>`;b.className=k==TAB?'on':'';
  b.onclick=()=>{TAB=k;$('ttl').textContent=TITLES[k];document.querySelectorAll('.tabs button').forEach(x=>x.classList.toggle('on',x==b));document.querySelectorAll('.pane').forEach(p=>p.classList.toggle('on',p.id=='p-'+k));if(RAW.length)render()};$('tabs').appendChild(b)});
 applyTheme();setTimer();load();
