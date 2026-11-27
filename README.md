@@ -5,7 +5,7 @@ Version6 :
 - Se han añadido los gastos por las propias herramientas de ClaudeCode: Skills, plugins, MCP ...
 
 
-📊 ClawCost Analytics: Analiza costes, estadísticas de modelos y proyectos en Claude Code.
+📊 <u><h1>ClawCost Analytics: Analiza costes, estadísticas de modelos y proyectos en Claude Code.</h1></u>
 
 Panel de monitorización con actualización automática (auto-refresh) diseñado para visualizar, analizar y auditar la actividad y el historial de tus sesiones en Claude Code.
 
