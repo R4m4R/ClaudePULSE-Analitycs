@@ -23,8 +23,8 @@ Transforma los registros y datos de uso de tu asistente de programación en mét
 📁 Métricas por proyecto: Agrupación de la actividad, el consumo y las sesiones según cada repositorio o directorio de trabajo.
 
 ⏱️ Tiempos y rendimiento: Registro de la duración de las sesiones, los tiempos de respuesta y la frecuencia de uso a lo largo del tiempo.
-
 📈 Visualización gráfica: Gráficos interactivos de tendencias históricas, distribución de carga y actividad diaria
+
 --------------------------------------------------------------------------------------------------------------------
 #ENGLISH
 
