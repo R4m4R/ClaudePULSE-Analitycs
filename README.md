@@ -29,9 +29,9 @@ Transforma los registros y datos de uso de tu asistente de programación en mét
 #ENGLISH
 
 CLAWCOST-ANALYTICS
-Status dashboard, metrics, and charts for your Claude Code application (optimized for Windows).<
+Status dashboard, metrics, and charts for your Claude Code application (optimized for Windows).
 
-<h2>📊 ClawCost Analytics: Analyze costs, model statistics, and projects in Claude Code./h2>
+<h2>📊 ClawCost Analytics: Analyze costs, model statistics, and projects in Claude Code.</h2>
 
   *FOR WINDOWS*
 
