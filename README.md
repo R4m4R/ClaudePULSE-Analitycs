@@ -1,6 +1,6 @@
 ******************* UNOFFICIAL *******************
 
-Version6 : 
+<b>Version6 :</b> 
 - se han mejorado los costes y % de uso
 - Se han añadido los gastos por las propias herramientas de ClaudeCode: Skills, plugins, MCP ...
 
@@ -26,7 +26,7 @@ Transforma los registros y datos de uso de tu asistente de programación en mét
 📈 Visualización gráfica: Gráficos interactivos de tendencias históricas, distribución de carga y actividad diaria
 
 --------------------------------------------------------------------------------------------------------------------
-#ENGLISH
+<b>#ENGLISH</b>
 
 CLAWCOST-ANALYTICS
 Status dashboard, metrics, and charts for your Claude Code application (optimized for Windows).
@@ -51,6 +51,7 @@ Transform your coding assistant's logs and usage data into actionable metrics an
 ⏱️ Time & Performance: Tracking of session durations, response times, and usage frequency over time.
 
 📈 Graphical Visualization: Interactive charts showing historical trends, workload distribution, and daily activity.
+--------------------------------------------------------------------------------------------------------------------
 
 
 
